@@ -8,7 +8,7 @@ import {
   Sun, Moon, Shield, Download, Clock, ChevronUp, ChevronDown, Trash2, Info,
   CheckCircle2, Star, ShieldAlert, Timer, StickyNote, Users as UsersIcon, Edit2, Save,
   Cake, Share2, Globe, Copy, Crown, Check, AlertCircle, DollarSign, Wallet, PieChart, RefreshCw, CloudOff, Cloud,
-  Gift, PartyPopper, Award, Receipt, History, Palette, Loader2, MousePointer2, Camera, Upload, Mic, Square, Play, Pause, FileSpreadsheet, FileText as FileTextIcon, FileCode, Image as ImageIcon
+  Gift, PartyPopper, Award, Receipt, History, Palette, Loader2, MousePointer2, Camera, Upload, Mic, Square, Play, Pause, FileSpreadsheet, FileText as FileTextIcon, FileCode, Image as ImageIcon, CalendarDays
 } from 'lucide-react';
 import { CategoryType, SubCategoryType, ReminderDate, View, AppState, TimeUnit, LanguageCode, Expense, ExpenseCategory } from './types';
 import { TRANSLATIONS, CATEGORY_DETAILS, SUB_CATEGORY_DETAILS, SUB_MAP, LANGUAGE_NAMES } from './constants';
@@ -16,6 +16,31 @@ import { TRANSLATIONS, CATEGORY_DETAILS, SUB_CATEGORY_DETAILS, SUB_MAP, LANGUAGE
 const SHARED_GLOW_EFFECT = "shadow-[0_0_40px_-5px_rgba(255,255,255,0.22),0_0_15px_-2px_rgba(255,255,255,0.15)]";
 const APP_URL = "https://play.google.com/store/apps/details?id=com.mydays&myexpenses.app"; 
 const GITHUB_WALLPAPER_URL = "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/DESK2.png";
+
+// Extend translations with new required keys
+const EXTENDED_TRANSLATIONS = {
+  ...TRANSLATIONS,
+  en: {
+    ...TRANSLATIONS.en,
+    addManually: 'ADD MANUALLY',
+    importGoogleCalendar: 'IMPORT FROM GOOGLE CALENDAR',
+    noContactBirthdays: 'No dates found in your contacts. Make sure they have the "Birthday" field filled or add them manually.',
+    manualAddTitle: 'ADD BIRTHDAY',
+    manualAddSub: 'Enter the details of the birthday to save',
+    namePlaceholder: 'Friend\'s Name',
+    dateOfBirth: 'DATE OF BIRTH'
+  },
+  es: {
+    ...TRANSLATIONS.es,
+    addManually: 'AÑADIR MANUALMENTE',
+    importGoogleCalendar: 'IMPORTAR DE GOOGLE CALENDAR',
+    noContactBirthdays: 'No hemos encontrado fechas en tus contactos. Asegúrate de que tengan el campo "Cumpleaños" relleno o añádelos manualmente.',
+    manualAddTitle: 'AÑADIR CUMPLEAÑOS',
+    manualAddSub: 'Introduce los datos del cumpleaños para guardarlo',
+    namePlaceholder: 'Nombre del Amigo/a',
+    dateOfBirth: 'FECHA DE NACIMIENTO'
+  }
+};
 
 const calculateDaysUntil = (item: ReminderDate) => {
   const today = new Date();
@@ -254,6 +279,10 @@ const App: React.FC = () => {
   const [isWallpaperDeleteConfirmOpen, setIsWallpaperDeleteConfirmOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+  // New state for Birthday Management
+  const [isManualAddModalOpen, setIsManualAddModalOpen] = useState(false);
+  const [isNoContactBirthdaysAlertOpen, setIsNoContactBirthdaysAlertOpen] = useState(false);
   
   const [selectedEvent, setSelectedEvent] = useState<ReminderDate | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -409,11 +438,27 @@ const App: React.FC = () => {
   const handleImportContacts = () => {
     if (!state.isPro) { setIsPaywallOpen(true); return; }
     setIsImporting(true);
+    // Simulated contact import logic
     setTimeout(() => {
       setIsImporting(false);
       setIsContactConfirmOpen(false);
-      alert(state.language === 'es' ? 'Contactos importados con éxito.' : 'Contacts imported successfully.');
+      // Logic for "No birthdays found"
+      const foundBirthdays = false; // Simulated result
+      if (!foundBirthdays) {
+        setIsNoContactBirthdaysAlertOpen(true);
+      } else {
+        alert(state.language === 'es' ? 'Contactos importados con éxito.' : 'Contacts imported successfully.');
+      }
     }, 2000);
+  };
+
+  const handleImportGoogleCalendar = () => {
+    if (!state.isPro) { setIsPaywallOpen(true); return; }
+    setIsSyncing(true);
+    setTimeout(() => {
+      setIsSyncing(false);
+      alert(state.language === 'es' ? 'Eventos de Google Calendar importados.' : 'Google Calendar events imported.');
+    }, 1500);
   };
 
   const startRecording = async () => {
@@ -478,7 +523,7 @@ const App: React.FC = () => {
     setIsNotifTimeModalOpen(false);
   };
 
-  const t = TRANSLATIONS[state.language] || TRANSLATIONS.en;
+  const t = EXTENDED_TRANSLATIONS[state.language] || EXTENDED_TRANSLATIONS.en;
 
   const uiBaseOpacity = state.user.wallpaper ? (1 - state.user.wallpaperOpacity * 0.7) : 1;
   const section1BgStyle = state.user.wallpaper ? { backgroundColor: state.theme === 'dark' ? `rgba(15, 23, 42, ${uiBaseOpacity})` : `rgba(255, 255, 255, ${uiBaseOpacity})` } : {};
@@ -1289,6 +1334,17 @@ const App: React.FC = () => {
         </div>
       )}
 
+      {isNoContactBirthdaysAlertOpen && (
+        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[1300] flex items-center justify-center p-8">
+          <div style={modalBgStyle} className={`w-full max-w-xs rounded-[3.5rem] p-9 text-center animate-in zoom-in duration-300 shadow-2xl`}>
+            <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-[2rem] flex items-center justify-center mx-auto mb-6"><AlertCircle className="w-8 h-8" /></div>
+            <h3 className="text-sm font-black mb-6 uppercase tracking-tighter">{state.language === 'es' ? 'AVISO' : 'NOTICE'}</h3>
+            <p className="text-[11px] font-bold text-slate-400 mb-8 leading-relaxed">{t.noContactBirthdays}</p>
+            <button onClick={() => setIsNoContactBirthdaysAlertOpen(false)} className="w-full py-5 rounded-[1.8rem] bg-indigo-600 text-white font-black text-[11px] uppercase tracking-widest shadow-xl">{t.thanks}</button>
+          </div>
+        </div>
+      )}
+
       {isDirectModeConfirmOpen && (
         <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[1100] flex items-center justify-center p-8">
           <div style={modalBgStyle} className={`w-full max-w-xs rounded-[3.5rem] p-9 text-center animate-in zoom-in duration-300 shadow-2xl`}>
@@ -1317,8 +1373,57 @@ const App: React.FC = () => {
               <div className={`p-6 rounded-[2rem] border transition-all ${state.theme === 'dark' ? 'bg-indigo-900/20 border-indigo-500/30' : 'bg-indigo-50 border-indigo-100'}`}>
                 <p className={`text-[16.8px] font-medium leading-relaxed mb-4 italic whitespace-pre-line break-words ${state.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>"{SHARE_MESSAGE_CUMPLEAÑOS(state.language, state.user.dateOfBirth || '')}"</p>
                 <button onClick={() => { navigator.clipboard.writeText(SHARE_MESSAGE_CUMPLEAÑOS(state.language, state.user.dateOfBirth || '')); alert(t.copiedToClipboard); }} className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg flex items-center justify-center gap-3 active:scale-95 transition-all"><Copy className="w-4 h-4" strokeWidth={1.5} /> {t.copyText}</button>
+                
+                <div className="grid grid-cols-1 gap-4 mt-6">
+                  <button onClick={() => setIsManualAddModalOpen(true)} className="w-full py-4 bg-white dark:bg-slate-700 text-indigo-600 dark:text-white border border-indigo-100 dark:border-indigo-500/30 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-sm flex items-center justify-center gap-3 active:scale-95 transition-all">
+                    <Plus className="w-4 h-4" strokeWidth={2.5} /> {t.addManually}
+                  </button>
+                  <button onClick={handleImportGoogleCalendar} className="w-full py-4 bg-white dark:bg-slate-700 text-indigo-600 dark:text-white border border-indigo-100 dark:border-indigo-500/30 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-sm flex items-center justify-center gap-3 active:scale-95 transition-all">
+                    <img src="https://www.google.com/favicon.ico" className="w-4 h-4" alt="Google" /> {t.importGoogleCalendar}
+                  </button>
+                </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {isManualAddModalOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[800] flex items-end justify-center">
+          <div style={modalBgStyle} className={`w-full max-w-xl rounded-t-[3.5rem] p-9 animate-in slide-in-from-bottom max-h-[92vh] overflow-y-auto ${state.theme === 'dark' ? 'text-white' : 'text-slate-700 shadow-2xl'}`}>
+            <div className="flex justify-between items-start mb-6">
+              <div><h2 className="text-2xl font-black uppercase tracking-widest leading-tight">{t.manualAddTitle}</h2><p className="text-[11px] font-bold uppercase tracking-tight mt-2 text-slate-400">{t.manualAddSub}</p></div>
+              <button onClick={() => setIsManualAddModalOpen(false)} className="p-3 bg-slate-100 dark:bg-slate-700 rounded-full active:scale-75 transition-all"><X className="w-5 h-5 text-slate-900 dark:text-white"/></button>
+            </div>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const fd = new FormData(e.currentTarget);
+              const newItem: ReminderDate = {
+                id: Math.random().toString(36).substring(2),
+                title: fd.get('name') as string,
+                date: fd.get('date') as string,
+                category: CategoryType.BIRTHDAYS,
+                subCategory: 'AMIGOS',
+                reminderFrequency: 'one-time',
+                notifyDaysBefore: [1],
+                repeatYearly: true
+              };
+              setState(p => ({ ...p, dates: [...p.dates, newItem] }));
+              setIsManualAddModalOpen(false);
+              setIsShareModalOpen(false);
+            }} className="space-y-6 pb-12">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest px-1 text-indigo-600">{t.title}</label>
+                <input required name="name" placeholder={t.namePlaceholder} className={`w-full p-6 rounded-[2.2rem] font-bold text-[18.5px] outline-none border transition-all ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 text-white focus:border-indigo-400` : `bg-slate-50 border-slate-100 text-slate-900 focus:border-indigo-300`}`} />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest px-1 text-indigo-600">{t.dateOfBirth}</label>
+                <input required name="date" type="date" className={`w-full p-6 rounded-[2.2rem] font-bold text-[18.5px] outline-none border transition-all ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 text-white focus:border-indigo-400` : `bg-slate-50 border-slate-100 text-slate-900 focus:border-indigo-300`}`} />
+              </div>
+              <button type="submit" className="w-full bg-indigo-600 text-white py-6 rounded-[2.5rem] font-black uppercase tracking-[0.2em] shadow-2xl mt-6 active:scale-95 transition-all flex items-center justify-center gap-3">
+                <Save className="w-5 h-5" strokeWidth={1.5} /> {t.save}
+              </button>
+            </form>
           </div>
         </div>
       )}
