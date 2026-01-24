@@ -1,0 +1,9 @@
+{
+  "name": "Copy of  MY DAYS  - V1.0 PARA TIENDA 1",
+  "description": "Professional anniversary and document reminder app. Lifetime Gold system and multi-language support (EN/ES).",
+  "version": "1.0.0",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
