@@ -101,7 +101,7 @@ const DateCard: React.FC<{ item: ReminderDate, language: LanguageCode, theme: 'l
         <div className="flex-1">
           <h3 className={`font-black text-[17.5px] legacy-tight ${theme === 'dark' ? 'text-white' : (isNote ? themeDetails.textColor : 'text-slate-600')}`}>{item.title}</h3>
           <p className={`text-[12.5px] font-bold uppercase tracking-widest mt-1 ${isNote ? themeDetails.textColor : 'text-slate-400'}`}>
-            {new Date(item.date).toLocaleDateString(language, { day: '2-digit', month: '2-digit', year: (item.repeatYearly && !isNote) ? undefined : 'numeric' })} {item.category === CategoryType.APPOINTMENTS && item.time ? `- ${formatTimeTo12h(item.time)}` : ''} {isNote && '• NOTE'}
+            {new Date(item.date).toLocaleDateString(language, { day: '2-digit', month: '2-digit', year: (item.repeatYearly && !isNote) ? undefined : 'numeric' })} {item.category === CategoryType.APPOINTMENTS && item.time ? `- ${formatTimeTo12h(item.time)}` : ''} {isNote && (language === 'es' ? '• NOTA' : '• NOTE')}
           </p>
         </div>
       </div>
@@ -1242,8 +1242,8 @@ const App: React.FC = () => {
             </div>
             <div className="py-6 flex flex-col items-center gap-6">
               <div className="grid grid-cols-[1fr_1fr_1fr] gap-3 w-full">
-                <select value={notifHour} onChange={(e) => setNotifHour(e.target.value)} className={`w-full p-5 rounded-3xl font-black outline-none border text-center ${state.theme === 'dark' ? 'bg-slate-700 border-slate-600 text-white' : 'bg-slate-50 border-slate-100 text-slate-900'}`}>{Array.from({length: 12}, (_, i) => String(i === 0 ? 12 : i).padStart(2, '0')).map(h => <option key={h} value={h}>{h}</option>)}</select>
-                <select value={notifMin} onChange={(e) => setNotifMin(e.target.value)} className={`w-full p-5 rounded-3xl font-black outline-none border text-center ${state.theme === 'dark' ? 'bg-slate-700 border-slate-600 text-white' : 'bg-slate-50 border-slate-100 text-slate-900'}`}>{Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => <option key={m} value={m}>{m}</option>)}</select>
+                <select value={notifHour} onChange={(e) => setNotifHour(e.target.value)} className={`w-full p-5 rounded-3xl font-black outline-none border text-center ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 text-white` : `bg-slate-50 border-slate-100 text-slate-900`}`}>{Array.from({length: 12}, (_, i) => String(i === 0 ? 12 : i).padStart(2, '0')).map(h => <option key={h} value={h}>{h}</option>)}</select>
+                <select value={notifMin} onChange={(e) => setNotifMin(e.target.value)} className={`w-full p-5 rounded-3xl font-black outline-none border text-center ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 text-white` : `bg-slate-50 border-slate-100 text-slate-900`}`}>{Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => <option key={m} value={m}>{m}</option>)}</select>
                 <button type="button" onClick={() => setNotifAmPm(prev => prev === 'AM' ? 'PM' : 'AM')} className={`w-full p-5 rounded-3xl font-black outline-none border transition-all ${notifAmPm === 'AM' ? 'bg-emerald-500 text-white border-emerald-600 shadow-md' : 'bg-indigo-600 text-white border-indigo-700 shadow-md'}`}>{notifAmPm}</button>
               </div>
             </div>
@@ -1375,7 +1375,7 @@ const App: React.FC = () => {
                 <button onClick={() => { navigator.clipboard.writeText(SHARE_MESSAGE_CUMPLEAÑOS(state.language, state.user.dateOfBirth || '')); alert(t.copiedToClipboard); }} className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg flex items-center justify-center gap-3 active:scale-95 transition-all"><Copy className="w-4 h-4" strokeWidth={1.5} /> {t.copyText}</button>
                 
                 <div className="grid grid-cols-1 gap-4 mt-6">
-                  <button onClick={() => setIsManualAddModalOpen(true)} className="w-full py-4 bg-white dark:bg-slate-700 text-indigo-600 dark:text-white border border-indigo-100 dark:border-indigo-500/30 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-sm flex items-center justify-center gap-3 active:scale-95 transition-all">
+                  <button onClick={() => { setBirthDay('01'); setBirthMonth('01'); setIsManualAddModalOpen(true); }} className="w-full py-4 bg-white dark:bg-slate-700 text-indigo-600 dark:text-white border border-indigo-100 dark:border-indigo-500/30 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-sm flex items-center justify-center gap-3 active:scale-95 transition-all">
                     <Plus className="w-4 h-4" strokeWidth={2.5} /> {t.addManually}
                   </button>
                   <button onClick={handleImportGoogleCalendar} className="w-full py-4 bg-white dark:bg-slate-700 text-indigo-600 dark:text-white border border-indigo-100 dark:border-indigo-500/30 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-sm flex items-center justify-center gap-3 active:scale-95 transition-all">
@@ -1401,7 +1401,7 @@ const App: React.FC = () => {
               const newItem: ReminderDate = {
                 id: Math.random().toString(36).substring(2),
                 title: fd.get('name') as string,
-                date: fd.get('date') as string,
+                date: `2000-${birthMonth}-${birthDay}`,
                 category: CategoryType.BIRTHDAYS,
                 subCategory: 'AMIGOS',
                 reminderFrequency: 'one-time',
@@ -1418,7 +1418,18 @@ const App: React.FC = () => {
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] font-black uppercase tracking-widest px-1 text-indigo-600">{t.dateOfBirth}</label>
-                <input required name="date" type="date" className={`w-full p-6 rounded-[2.2rem] font-bold text-[18.5px] outline-none border transition-all ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 text-white focus:border-indigo-400` : `bg-slate-50 border-slate-100 text-slate-900 focus:border-indigo-300`}`} />
+                <div className="grid grid-cols-2 gap-4">
+                  <select value={birthDay} onChange={(e) => setBirthDay(e.target.value)} className={`w-full p-6 rounded-[2.2rem] font-bold outline-none border ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 text-white focus:border-indigo-400` : `bg-slate-50 border-slate-100 text-slate-900 focus:border-indigo-300`}`}>
+                    {Array.from({length: 31}, (_, i) => String(i + 1).padStart(2, '0')).map(d => <option key={d} value={d}>{d}</option>)}
+                  </select>
+                  <select value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)} className={`w-full p-6 rounded-[2.2rem] font-bold outline-none border ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 text-white focus:border-indigo-400` : `bg-slate-50 border-slate-100 text-slate-900 focus:border-indigo-300`}`}>
+                    {Array.from({length: 12}, (_, i) => {
+                       const m = String(i + 1).padStart(2, '0');
+                       const label = new Date(2000, i, 1).toLocaleString(state.language, { month: 'long' });
+                       return <option key={m} value={m}>{label.toUpperCase()}</option>
+                    })}
+                  </select>
+                </div>
               </div>
               <button type="submit" className="w-full bg-indigo-600 text-white py-6 rounded-[2.5rem] font-black uppercase tracking-[0.2em] shadow-2xl mt-6 active:scale-95 transition-all flex items-center justify-center gap-3">
                 <Save className="w-5 h-5" strokeWidth={1.5} /> {t.save}
