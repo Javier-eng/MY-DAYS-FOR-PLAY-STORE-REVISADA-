@@ -50,9 +50,9 @@ const formatTimeTo12h = (time24: string) => {
 const SHARE_MESSAGE_CUMPLEAÑOS = (lang: LanguageCode, userDob: string) => {
   const formattedDob = userDob ? new Date(userDob).toLocaleDateString(lang, { day: 'numeric', month: 'long' }) : '###';
   if (lang === 'es') {
-    return `Hola, acabo de instalarme una aplicación para recordar la fecha de cumpleaños de mis amigos, recuérdame cuándo es tu cumpleaños por favor.\n\nTe dejo el link de la aplicación por si quieres recordar el mío que es el ${formattedDob}.\n\nLa app sirve también para recordarte otras cosas importantes y es gratis. ${APP_URL} `;
+    return `Hola, acabo de instalarme una aplicación para recordar la fecha de cumpleaños de mis amigos, recuérdame cuándo es tu cumpleaños por favor.\n\nTe dejo el link de la aplicación por si quieres recordar el mío que es el ${formattedDob}.\n\nLa app sirve también para recordarte otras cosas importantes y es gratis, te la recomiendo. ${APP_URL} `;
   }
-  return `Hi! I just installed an app to remember my friends' birthdays. Could you please remind me when yours is?\n\nI'll leave the app link here in case you want to remember mine, which is on ${formattedDob}.\n\nThe app also helps you remember other important things and it's free. ${APP_URL} `;
+  return `Hi! I just installed an app to remember my friends' birthdays. Could you please remind me when yours is?\n\nI'll leave the app link here in case you want to remember mine, which is on ${formattedDob}.\n\nThe app also helps you remember other important things and it's free, I highly recommend it. ${APP_URL} `;
 };
 
 const DateCard: React.FC<{ item: ReminderDate, language: LanguageCode, theme: 'light' | 'dark', wallpaper?: string, onCardClick: (item: ReminderDate) => void, onDeleteClick: (id: string) => void }> = ({ item, language, theme, wallpaper, onCardClick, onDeleteClick }) => {
