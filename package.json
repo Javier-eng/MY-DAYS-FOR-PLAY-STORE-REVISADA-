@@ -5,7 +5,7 @@
   "sideEffects": false,
   "type": "module",
   "engines": {
-    "node": ">=20.0.0 <21.0.0"
+    "node": "20.x"
   },
   "scripts": {
     "build": "remix build",
