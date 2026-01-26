@@ -4,15 +4,8 @@ import { netlifyPlugin } from "@netlify/remix-adapter/plugin";
  
 export default defineConfig({
   plugins: [
-    remix({
-      // ESTA ES LA LÍNEA CLAVE:
-      buildDirectory: "public",
-      future: {
-        v3_fetcherPersist: true,
-        v3_relativeRoutingByFile: true,
-        v3_throwAbortReason: true,
-      },
-    }),
+    remix(),
     netlifyPlugin(),
   ],
 });
+ 
