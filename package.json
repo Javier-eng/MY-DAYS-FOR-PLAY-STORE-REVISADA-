@@ -2,6 +2,8 @@
   "name": "my-days-app",
   "version": "1.0.0",
   "private": true,
+  "description": "App for event management and expense tracking",
+  "author": "Iguazu",
   "dependencies": {
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
