@@ -1,13 +1,25 @@
-{
+{{
   "name": "my-days-app",
   "version": "1.0.0",
   "private": true,
-  "description": "App for event management and expense tracking",
-  "author": "Iguazu",
+  "description": "App for managing events and expenses",
+  "author": "Javier",
+  "scripts": {
+    "build": "remix vite:build",
+    "start": "remix-serve ./build/server/index.js"
+  },
   "dependencies": {
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "lucide-react": "^0.562.0",
-    "@google/genai": "^1.34.0"
+    "@google/genai": "^1.34.0",
+    "@remix-run/node": "latest",
+    "@remix-run/react": "latest",
+    "@remix-run/serve": "latest",
+    "isbot": "latest"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "latest",
+    "vite": "latest"
   }
 }
