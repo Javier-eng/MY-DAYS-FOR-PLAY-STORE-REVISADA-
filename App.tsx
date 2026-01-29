@@ -16,7 +16,6 @@ const SHARED_GLOW_EFFECT = "shadow-[0_0_40px_-5px_rgba(255,255,255,0.22),0_0_15p
 const APP_URL = "https://play.google.com/store/apps/details?id=com.mydays&myexpenses.app";
 const GITHUB_WALLPAPER_URL = "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/DESK2.png";
 
-// Extend translations with new required keys
 const EXTENDED_TRANSLATIONS = {
   ...TRANSLATIONS,
   en: {
@@ -279,7 +278,6 @@ const App = () => {
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
-  // New state for Birthday Management
   const [isManualAddModalOpen, setIsManualAddModalOpen] = useState(false);
   const [isNoContactBirthdaysAlertOpen, setIsNoContactBirthdaysAlertOpen] = useState(false);
  
@@ -437,12 +435,10 @@ const App = () => {
   const handleImportContacts = () => {
     if (!state.isPro) { setIsPaywallOpen(true); return; }
     setIsImporting(true);
-    // Simulated contact import logic
     setTimeout(() => {
       setIsImporting(false);
       setIsContactConfirmOpen(false);
-      // Logic for "No birthdays found"
-      const foundBirthdays = false; // Simulated result
+      const foundBirthdays = false;
       if (!foundBirthdays) {
         setIsNoContactBirthdaysAlertOpen(true);
       } else {
