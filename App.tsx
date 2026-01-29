@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { 
-  Plus, LayoutGrid, Home, Calendar as CalendarIcon, 
+import {
+  Plus, LayoutGrid, Home, Calendar as CalendarIcon,
   Settings as SettingsIcon, Bell, ChevronRight, ChevronLeft,
-  Search, Sparkles, Languages, CreditCard, 
+  Search, Sparkles, Languages, CreditCard,
   X, Zap, Volume2, Mail, Smartphone, Repeat, User as UserIcon,
   Sun, Moon, Shield, Download, Clock, ChevronUp, ChevronDown, Trash2, Info,
   CheckCircle2, Star, ShieldAlert, Timer, StickyNote, Users as UsersIcon, Edit2, Save,
@@ -14,7 +13,7 @@ import { CategoryType, SubCategoryType, ReminderDate, View, AppState, TimeUnit, 
 import { TRANSLATIONS, CATEGORY_DETAILS, SUB_CATEGORY_DETAILS, SUB_MAP, LANGUAGE_NAMES } from './constants';
 
 const SHARED_GLOW_EFFECT = "shadow-[0_0_40px_-5px_rgba(255,255,255,0.22),0_0_15px_-2px_rgba(255,255,255,0.15)]";
-const APP_URL = "https://play.google.com/store/apps/details?id=com.mydays&myexpenses.app"; 
+const APP_URL = "https://play.google.com/store/apps/details?id=com.mydays&myexpenses.app";
 const GITHUB_WALLPAPER_URL = "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/DESK2.png";
 
 // Extend translations with new required keys
@@ -42,7 +41,7 @@ const EXTENDED_TRANSLATIONS = {
   }
 };
 
-const calculateDaysUntil = (item: ReminderDate) => {
+const calculateDaysUntil = (item) => {
   const today = new Date();
   today.setHours(0,0,0,0);
   const itemDate = new Date(item.date);
@@ -57,14 +56,14 @@ const calculateDaysUntil = (item: ReminderDate) => {
   return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 };
 
-const formatDateForInput = (date: Date) => {
+const formatDateForInput = (date) => {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
   const d = String(date.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
 };
 
-const formatTimeTo12h = (time24: string) => {
+const formatTimeTo12h = (time24) => {
   if (!time24) return "";
   const [hours, minutes] = time24.split(':').map(Number);
   const ampm = hours >= 12 ? 'PM' : 'AM';
@@ -72,7 +71,7 @@ const formatTimeTo12h = (time24: string) => {
   return `${hours12}:${minutes.toString().padStart(2, '0')} ${ampm}`;
 };
 
-const SHARE_MESSAGE_CUMPLEAÑOS = (lang: LanguageCode, userDob: string) => {
+const SHARE_MESSAGE_CUMPLEAÑOS = (lang, userDob) => {
   const formattedDob = userDob ? new Date(userDob).toLocaleDateString(lang, { day: 'numeric', month: 'long' }) : '###';
   if (lang === 'es') {
     return `Hola, acabo de instalarme una aplicación para recordar la fecha de cumpleaños de mis amigos, recuérdame cuándo es tu cumpleaños por favor.\n\nTe dejo el link de la aplicación por si quieres recordar el mío que es el ${formattedDob}.\n\nLa app sirve también para recordarte otras cosas importantes y es gratis, te la recomiendo. ${APP_URL} `;
@@ -80,8 +79,8 @@ const SHARE_MESSAGE_CUMPLEAÑOS = (lang: LanguageCode, userDob: string) => {
   return `Hi! I just installed an app to remember my friends' birthdays. Could you please remind me when yours is?\n\nI'll leave the app link here in case you want to remember mine, which is on ${formattedDob}.\n\nThe app also helps you remember other important things and it's free, I highly recommend it. ${APP_URL} `;
 };
 
-const DateCard: React.FC<{ item: ReminderDate, language: LanguageCode, theme: 'light' | 'dark', wallpaper?: string, onCardClick: (item: ReminderDate) => void, onDeleteClick: (id: string) => void }> = ({ item, language, theme, wallpaper, onCardClick, onDeleteClick }) => {
-  const isNote = item.category === CategoryType.NOTES; 
+const DateCard = ({ item, language, theme, wallpaper, onCardClick, onDeleteClick }) => {
+  const isNote = item.category === CategoryType.NOTES;
   const days = !isNote ? calculateDaysUntil(item) : 0;
   const themeKey = isNote ? (item.noteColor || CategoryType.NOTES) : item.category;
   let themeDetails = { ...CATEGORY_DETAILS[themeKey] };
@@ -92,12 +91,12 @@ const DateCard: React.FC<{ item: ReminderDate, language: LanguageCode, theme: 'l
   }
 
   const isPast = !isNote && days < 0;
-  const displayIcon = isNote ? <StickyNote className={`w-[21.2px] h-[21.2px] ${themeDetails.textColor}`} strokeWidth={1.5} /> : (item.category === CategoryType.BIRTHDAYS ? React.cloneElement(themeDetails.icon as React.ReactElement<any>, { className: "w-[21.2px] h-[21.2px]", strokeWidth: 1.5 }) : (SUB_CATEGORY_DETAILS[item.subCategory]?.icon || themeDetails.icon));
-  
+  const displayIcon = isNote ? <StickyNote className={`w-[21.2px] h-[21.2px] ${themeDetails.textColor}`} strokeWidth={1.5} /> : (item.category === CategoryType.BIRTHDAYS ? React.cloneElement(themeDetails.icon, { className: "w-[21.2px] h-[21.2px]", strokeWidth: 1.5 }) : (SUB_CATEGORY_DETAILS[item.subCategory]?.icon || themeDetails.icon));
+ 
   return (
     <div onClick={() => onCardClick(item)} className={`rounded-[2.2rem] p-4 mb-2 border flex items-center justify-between active:scale-[0.98] transition-all cursor-pointer relative z-10 ${theme === 'dark' ? (wallpaper ? 'bg-slate-800/70 border-slate-700 backdrop-blur-md' : 'bg-slate-800 border-slate-700') : (wallpaper ? 'bg-white/70 border-slate-100 shadow-sm backdrop-blur-md' : 'bg-white border-slate-100 shadow-sm')}`}>
       <div className="flex items-center gap-5 flex-1 pointer-events-none">
-        <div className={`w-[51px] h-[51px] rounded-2xl flex items-center justify-center shrink-0 ${themeDetails.lightColor} ${themeDetails.textColor}`}>{isNote ? displayIcon : React.cloneElement(displayIcon as React.ReactElement<any>, { className: "w-[21.2px] h-[21.2px]", strokeWidth: 1.5 })}</div>
+        <div className={`w-[51px] h-[51px] rounded-2xl flex items-center justify-center shrink-0 ${themeDetails.lightColor} ${themeDetails.textColor}`}>{isNote ? displayIcon : React.cloneElement(displayIcon, { className: "w-[21.2px] h-[21.2px]", strokeWidth: 1.5 })}</div>
         <div className="flex-1">
           <h3 className={`font-black text-[17.5px] legacy-tight ${theme === 'dark' ? 'text-white' : (isNote ? themeDetails.textColor : 'text-slate-600')}`}>{item.title}</h3>
           <p className={`text-[12.5px] font-bold uppercase tracking-widest mt-1 ${isNote ? themeDetails.textColor : 'text-slate-400'}`}>
@@ -113,9 +112,9 @@ const DateCard: React.FC<{ item: ReminderDate, language: LanguageCode, theme: 'l
   );
 };
 
-const App: React.FC = () => {
+const App = () => {
   const browserLang = navigator.language.startsWith('es') ? 'es' : 'en';
-  const [onboardingStep, setOnboardingStep] = useState<'splash' | 'carousel' | 'hidden'>(() => {
+  const [onboardingStep, setOnboardingStep] = useState(() => {
     return localStorage.getItem('vitaldates_onboarding_v1') ? 'hidden' : 'splash';
   });
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -132,7 +131,7 @@ const App: React.FC = () => {
     "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/B5.png"
   ];
 
-  const splashImg = browserLang === 'es' 
+  const splashImg = browserLang === 'es'
     ? "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/C1.png"
     : "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/B1.png";
 
@@ -162,40 +161,40 @@ const App: React.FC = () => {
     }
   };
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const expenseFileInputRef = useRef<HTMLInputElement>(null);
-  const wallpaperInputRef = useRef<HTMLInputElement>(null);
-  const attachmentInputRef = useRef<HTMLInputElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<BlobPart[]>([]);
-  
+  const fileInputRef = useRef(null);
+  const expenseFileInputRef = useRef(null);
+  const wallpaperInputRef = useRef(null);
+  const attachmentInputRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+ 
   const [isPreloading, setIsPreloading] = useState(false);
   const [isDirectOnce, setIsDirectOnce] = useState(false);
 
-  const [state, setState] = useState<AppState>(() => {
+  const [state, setState] = useState(() => {
     const saved = localStorage.getItem('vitaldates_v32_state');
     const cachedWallpaper = localStorage.getItem('vitaldates_wallpaper_cache');
-    
-    const defaults: AppState = {
+   
+    const defaults = {
       dates: [],
       expenses: [],
-      language: browserLang as LanguageCode,
+      language: browserLang,
       isPro: false,
       theme: 'light',
-      user: { 
-        name: 'User', 
-        email: 'hello@mail.com', 
-        subscription: 'free', 
-        dateOfBirth: '1995-01-01', 
-        currency: '$', 
-        showProfileImage: true, 
+      user: {
+        name: 'User',
+        email: 'hello@mail.com',
+        subscription: 'free',
+        dateOfBirth: '1995-01-01',
+        currency: '$',
+        showProfileImage: true,
         wallpaperOpacity: 0.5,
         wallpaper: cachedWallpaper || undefined
       },
       globalSettings: {
         categoryConfigs: {
-          [CategoryType.BIRTHDAYS]: { daysBefore: 1, notificationTime: '08:00' }, 
-          [CategoryType.DOCUMENTS]: { daysBefore: 30, notificationTime: '12:00' }, 
+          [CategoryType.BIRTHDAYS]: { daysBefore: 1, notificationTime: '08:00' },
+          [CategoryType.DOCUMENTS]: { daysBefore: 30, notificationTime: '12:00' },
           [CategoryType.SUBSCRIPTIONS]: { daysBefore: 7, notificationTime: '12:00' },
           [CategoryType.APPOINTMENTS]: { daysBefore: 2, notificationTime: '12:00' },
           [CategoryType.NOTES]: { daysBefore: 0, notificationTime: '00:00' },
@@ -216,7 +215,7 @@ const App: React.FC = () => {
           ...parsed,
           user: { ...defaults.user, ...parsed.user, wallpaper: cachedWallpaper || parsed.user.wallpaper },
           globalSettings: { ...defaults.globalSettings, ...parsed.globalSettings },
-          expenses: parsed.expenses || [], 
+          expenses: parsed.expenses || [],
           dates: parsed.dates || []
         };
       } catch (e) {
@@ -254,17 +253,17 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const [currentView, setCurrentView] = useState<View>('dashboard');
-  const [activeCategory, setActiveCategory] = useState<CategoryType | null>(null);
-  const [activeSubCategory, setActiveSubCategory] = useState<SubCategoryType | null>(null);
-  const [dashboardFilter, setDashboardFilter] = useState<CategoryType | null>(null);
-  
+  const [currentView, setCurrentView] = useState('dashboard');
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [activeSubCategory, setActiveSubCategory] = useState(null);
+  const [dashboardFilter, setDashboardFilter] = useState(null);
+ 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExpenseModalOpen, setIsModalOpenExpense] = useState(false);
   const [isViewExpensesModalOpen, setIsViewExpensesModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<string | null>(null);
-  const [isDeleteExpenseConfirmOpen, setIsDeleteExpenseConfirmOpen] = useState<string | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(null);
+  const [isDeleteExpenseConfirmOpen, setIsDeleteExpenseConfirmOpen] = useState(null);
   const [isContactConfirmOpen, setIsContactConfirmOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isLangModalOpen, setIsLangModalOpen] = useState(false);
@@ -283,37 +282,37 @@ const App: React.FC = () => {
   // New state for Birthday Management
   const [isManualAddModalOpen, setIsManualAddModalOpen] = useState(false);
   const [isNoContactBirthdaysAlertOpen, setIsNoContactBirthdaysAlertOpen] = useState(false);
-  
-  const [selectedEvent, setSelectedEvent] = useState<ReminderDate | null>(null);
+ 
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [calendarDate, setCalendarDate] = useState(new Date());
-  const [selectedCalendarDay, setSelectedCalendarDay] = useState<Date | null>(new Date());
-  const [isDirectAddMode, setIsDirectAddMode] = useState(false); 
-  const [expandedExpenseCat, setExpandedExpenseCat] = useState<string | null>(null);
-  
+  const [selectedCalendarDay, setSelectedCalendarDay] = useState(new Date());
+  const [isDirectAddMode, setIsDirectAddMode] = useState(false);
+  const [expandedExpenseCat, setExpandedExpenseCat] = useState(null);
+ 
   const [repeatYearly, setRepeatYearly] = useState(false);
-  
+ 
   const [modalNotifyValue, setModalNotifyValue] = useState(1);
   const [detailNotifyValue, setDetailNotifyValue] = useState(1);
   const [detailNotes, setDetailNotes] = useState('');
-  const [noteIconColor, setNoteIconColor] = useState<CategoryType>(CategoryType.NOTES);
+  const [noteIconColor, setNoteIconColor] = useState(CategoryType.NOTES);
 
   const [apptHour, setApptHour] = useState('12');
   const [apptMin, setApptMin] = useState('00');
-  const [apptAmPm, setApptAmPm] = useState<'AM' | 'PM'>('AM');
+  const [apptAmPm, setApptAmPm] = useState('AM');
 
   const [notifHour, setNotifHour] = useState('09');
   const [notifMin, setNotifMin] = useState('00');
-  const [notifAmPm, setNotifAmPm] = useState<'AM' | 'PM'>('AM');
+  const [notifAmPm, setNotifAmPm] = useState('AM');
 
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
-  const [audioBase64, setAudioBase64] = useState<string | null>(null);
-  const [attachedFileBase64, setAttachedFileBase64] = useState<string | null>(null);
-  const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
-  const [expensePhotoBase64, setExpensePhotoBase64] = useState<string | null>(null);
+  const [audioBase64, setAudioBase64] = useState(null);
+  const [attachedFileBase64, setAttachedFileBase64] = useState(null);
+  const [attachedFileName, setAttachedFileName] = useState(null);
+  const [expensePhotoBase64, setExpensePhotoBase64] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioPreviewRef = useRef<HTMLAudioElement | null>(null);
+  const audioPreviewRef = useRef(null);
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [isGoogleLoggedIn, setIsGoogleLoggedIn] = useState(false);
@@ -328,7 +327,7 @@ const App: React.FC = () => {
     localStorage.setItem('vitaldates_v32_state', JSON.stringify(state));
   }, [state]);
 
-  const getDayEvents = (date: Date) => {
+  const getDayEvents = (date) => {
     return state.dates.filter(item => {
       const d = new Date(item.date);
       if (item.repeatYearly && item.category !== CategoryType.NOTES) {
@@ -357,13 +356,13 @@ const App: React.FC = () => {
     setIsAutoDeleteConfirmOpen(false);
   };
 
-  const handleWallpaperUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleWallpaperUpload = (e) => {
     if (!state.isPro) { setIsPaywallOpen(true); return; }
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64 = reader.result as string;
+        const base64 = reader.result;
         try {
           localStorage.setItem('vitaldates_wallpaper_cache', base64);
           setState(prev => ({ ...prev, user: { ...prev.user, wallpaper: base64 } }));
@@ -375,31 +374,31 @@ const App: React.FC = () => {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setState(prev => ({ ...prev, user: { ...prev.user, profileImage: reader.result as string } }));
+        setState(prev => ({ ...prev, user: { ...prev.user, profileImage: reader.result } }));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleExpensePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleExpensePhotoUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => setExpensePhotoBase64(reader.result as string);
+      reader.onloadend = () => setExpensePhotoBase64(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
-  const handleAttachmentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!state.isPro) { 
-      setIsPaywallOpen(true); 
+  const handleAttachmentUpload = (e) => {
+    if (!state.isPro) {
+      setIsPaywallOpen(true);
       if (attachmentInputRef.current) attachmentInputRef.current.value = "";
-      return; 
+      return;
     }
     const file = e.target.files?.[0];
     if (file) {
@@ -427,10 +426,10 @@ const App: React.FC = () => {
   };
 
   const activatePremium = () => {
-    setState(prev => ({ 
-      ...prev, 
-      isPro: true, 
-      user: { ...prev.user, subscription: 'lifetime', purchaseDate: new Date().toLocaleDateString() } 
+    setState(prev => ({
+      ...prev,
+      isPro: true,
+      user: { ...prev.user, subscription: 'lifetime', purchaseDate: new Date().toLocaleDateString() }
     }));
     setIsPaywallOpen(false);
   };
@@ -479,7 +478,7 @@ const App: React.FC = () => {
       recorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
         const reader = new FileReader();
-        reader.onloadend = () => setAudioBase64(reader.result as string);
+        reader.onloadend = () => setAudioBase64(reader.result);
         reader.readAsDataURL(audioBlob);
         stream.getTracks().forEach(track => track.stop());
       };
@@ -497,15 +496,14 @@ const App: React.FC = () => {
       console.error("Mic error:", err);
     }
   };
-
-  const stopRecording = () => {
+const stopRecording = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
   };
 
-  const handleDownloadFile = (data: string, name: string) => {
+  const handleDownloadFile = (data, name) => {
     const link = document.createElement('a');
     link.href = data;
     link.download = name || 'download';
@@ -528,10 +526,10 @@ const App: React.FC = () => {
   const uiBaseOpacity = state.user.wallpaper ? (1 - state.user.wallpaperOpacity * 0.7) : 1;
   const section1BgStyle = state.user.wallpaper ? { backgroundColor: state.theme === 'dark' ? `rgba(15, 23, 42, ${uiBaseOpacity})` : `rgba(255, 255, 255, ${uiBaseOpacity})` } : {};
   const section2BgStyle = state.user.wallpaper ? { backgroundColor: state.theme === 'dark' ? `rgba(15, 23, 42, ${uiBaseOpacity * 0.7})` : `rgba(255, 255, 255, ${uiBaseOpacity * 0.7})` } : {};
-  
-  const getSubtleBgStyle = (cat: CategoryType) => {
+ 
+  const getSubtleBgStyle = (cat) => {
     const opacity = state.user.wallpaper ? (uiBaseOpacity * 0.60) : 1;
-    const rgbMap: Record<string, string> = {
+    const rgbMap = {
       BIRTHDAYS: '255, 241, 242',      // Rose 50
       DOCUMENTS: '239, 246, 255',      // Blue 50
       SUBSCRIPTIONS: '255, 251, 235',  // Amber 50
@@ -539,7 +537,7 @@ const App: React.FC = () => {
       NOTES: '248, 250, 252',          // Slate 50
       VIOLET: '245, 243, 255'          // Violet 50
     };
-    const darkRgbMap: Record<string, string> = {
+    const darkRgbMap = {
       BIRTHDAYS: '69, 10, 31',         // Dark Rose
       DOCUMENTS: '23, 37, 84',         // Dark Blue
       SUBSCRIPTIONS: '69, 26, 3',      // Dark Amber
@@ -551,8 +549,8 @@ const App: React.FC = () => {
     return { backgroundColor: `rgba(${rgb}, ${opacity})` };
   };
 
-  const modalBgStyle = { 
-    backgroundColor: state.theme === 'dark' ? 'rgb(30, 41, 59)' : 'rgb(255, 255, 255)' 
+  const modalBgStyle = {
+    backgroundColor: state.theme === 'dark' ? 'rgb(30, 41, 59)' : 'rgb(255, 255, 255)'
   };
 
   const getMonthlyExpenses = useMemo(() => {
@@ -569,13 +567,13 @@ const App: React.FC = () => {
       acc[curr.category].total += curr.amount;
       acc[curr.category].items.push(curr);
       return acc;
-    }, {} as Record<string, { total: number, items: Expense[] }>);
+    }, {});
     return { monthName, total, grouped, itemsRaw: filtered };
   }, [state.expenses, calendarDate, state.language]);
 
-  const handleExport = (format: 'csv' | 'txt') => {
+  const handleExport = (format) => {
     let content = `${t.expensesOf} ${getMonthlyExpenses.monthName}\n\n`;
-    (Object.entries(getMonthlyExpenses.grouped) as [string, { total: number, items: Expense[] }][]).forEach(([cat, data]) => {
+    Object.entries(getMonthlyExpenses.grouped).forEach(([cat, data]) => {
       content += `--- ${t.expenseCategories[cat].toUpperCase()} ---\n`;
       data.items.forEach(it => {
         content += `${it.date} ${it.time} | ${it.amount} ${state.user.currency}\n`;
@@ -601,17 +599,17 @@ const App: React.FC = () => {
     return result;
   }, [state.dates, searchQuery, dashboardFilter]);
 
-  const openEventDetails = (item: ReminderDate) => {
+  const openEventDetails = (item) => {
     setSelectedEvent(item); setDetailNotes(item.notes || '');
     const currentAdvance = item.notifyDaysBefore[0];
     if (item.category === CategoryType.APPOINTMENTS) {
       if (currentAdvance === 0.25) setDetailNotifyValue(0); else if (currentAdvance === 0.5) setDetailNotifyValue(1);
       else if (currentAdvance > 24) setDetailNotifyValue(Math.floor(currentAdvance / 24) + 25); else setDetailNotifyValue(Math.floor(currentAdvance) + 1);
     } else setDetailNotifyValue(Math.floor(currentAdvance));
-    setIsDetailModalOpen(true); setIsDayModalOpen(false); 
+    setIsDetailModalOpen(true); setIsDayModalOpen(false);
   };
 
-  const getAdvanceLabel = (cat: CategoryType | null, value: number) => {
+  const getAdvanceLabel = (cat, value) => {
     if (cat === CategoryType.APPOINTMENTS) {
       if (value === 0) return `15 ${t.min_suffix}`; if (value === 1) return `30 ${t.min_suffix}`;
       if (value <= 25) { const h = value - 1; return `${h} ${h === 1 ? 'HOUR' : t.hour_suffix}`; }
@@ -625,14 +623,14 @@ const App: React.FC = () => {
     if (!selectedEvent) return;
     let finalAdvance = detailNotifyValue;
     if (selectedEvent.category === CategoryType.APPOINTMENTS) {
-       if (detailNotifyValue === 0) finalAdvance = 0.25; else if (detailNotifyValue === 1) finalAdvance = 0.5;
-       else if (detailNotifyValue <= 25) finalAdvance = detailNotifyValue - 1; else finalAdvance = (detailNotifyValue - 25) * 24;
+        if (detailNotifyValue === 0) finalAdvance = 0.25; else if (detailNotifyValue === 1) finalAdvance = 0.5;
+        else if (detailNotifyValue <= 25) finalAdvance = detailNotifyValue - 1; else finalAdvance = (detailNotifyValue - 25) * 24;
     }
     setState(prev => ({ ...prev, dates: prev.dates.map(d => d.id === selectedEvent.id ? { ...d, notes: detailNotes, notifyDaysBefore: [finalAdvance] } : d) }));
     setIsDetailModalOpen(false);
   };
 
-  const changeCalendarMonth = (offset: number) => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() + offset, 1));
+  const changeCalendarMonth = (offset) => setCalendarDate(new Date(calendarDate.getFullYear(), calendarDate.getMonth() + offset, 1));
 
   const renderCalendar = () => {
     const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
@@ -652,7 +650,7 @@ const App: React.FC = () => {
         <div className="grid grid-cols-7 gap-2 mb-8">
           {weekDays.map(d => <div key={d} className="text-center text-[10px] font-black text-slate-400 py-2">{d}</div>)}
           {days.map((d, idx) => {
-            const events = getDayEvents(d.date); 
+            const events = getDayEvents(d.date);
             const isSelected = selectedCalendarDay && selectedCalendarDay.getDate() === d.date.getDate() && selectedCalendarDay.getMonth() === d.date.getMonth() && selectedCalendarDay.getFullYear() === d.date.getFullYear();
             const categories = new Set(events.map(e => e.category));
             return (
@@ -691,59 +689,59 @@ const App: React.FC = () => {
     );
   };
 
-  const getDynamicModalStyles = (category: CategoryType | null, noteColor?: CategoryType, forNote: boolean = false) => {
+  const getDynamicModalStyles = (category, noteColor, forNote = false) => {
     const baseCategory = forNote ? (noteColor || CategoryType.NOTES) : category;
-    
+   
     if (!baseCategory) return { light: 'bg-indigo-50 border-indigo-100', text: 'text-indigo-600', focus: 'focus:border-indigo-500', accent: 'accent-indigo-600', label: 'text-slate-400', saveBtn: 'bg-indigo-600' };
 
     if (forNote && baseCategory === CategoryType.BIRTHDAYS) {
-      return { 
-        light: 'bg-pink-50 border-pink-100', 
-        text: 'text-pink-600', 
-        focus: 'focus:border-pink-300', 
-        accent: 'accent-pink-600', 
-        label: 'text-pink-500', 
-        saveBtn: 'bg-pink-600' 
+      return {
+        light: 'bg-pink-50 border-pink-100',
+        text: 'text-pink-600',
+        focus: 'focus:border-pink-300',
+        accent: 'accent-pink-600',
+        label: 'text-pink-500',
+        saveBtn: 'bg-pink-600'
       };
     }
 
     if (!forNote && baseCategory === CategoryType.BIRTHDAYS) {
-      return { 
-        light: 'bg-indigo-50 border-indigo-100', 
-        text: 'text-indigo-600', 
-        focus: 'focus:border-pink-300', 
-        accent: 'accent-indigo-600', 
-        label: 'text-indigo-500', 
-        saveBtn: 'bg-indigo-600' 
+      return {
+        light: 'bg-indigo-50 border-indigo-100',
+        text: 'text-indigo-600',
+        focus: 'focus:border-pink-300',
+        accent: 'accent-indigo-600',
+        label: 'text-indigo-500',
+        saveBtn: 'bg-indigo-600'
       };
     }
-    
+   
     if (baseCategory === CategoryType.SUBSCRIPTIONS) {
-      return { 
-        light: 'bg-orange-50 border-orange-100', 
-        text: 'text-orange-700', 
-        focus: 'focus:border-orange-300', 
-        accent: 'accent-orange-600', 
-        label: 'text-orange-600', 
-        saveBtn: 'bg-orange-600' 
+      return {
+        light: 'bg-orange-50 border-orange-100',
+        text: 'text-orange-700',
+        focus: 'focus:border-orange-300',
+        accent: 'accent-orange-600',
+        label: 'text-orange-600',
+        saveBtn: 'bg-orange-600'
       };
     }
 
     const baseColorName = baseCategory === CategoryType.DOCUMENTS ? 'blue' : baseCategory === CategoryType.APPOINTMENTS ? 'emerald' : baseCategory === CategoryType.VIOLET ? 'violet' : 'slate';
-    
-    return { 
-      light: baseCategory === CategoryType.DOCUMENTS ? 'bg-blue-50 border-blue-100' : 
+   
+    return {
+      light: baseCategory === CategoryType.DOCUMENTS ? 'bg-blue-50 border-blue-100' :
              baseCategory === CategoryType.APPOINTMENTS ? 'bg-emerald-50 border-emerald-100' :
              baseCategory === CategoryType.VIOLET ? 'bg-violet-50 border-violet-100' :
-             'bg-slate-50 border-slate-100', 
-      text: baseCategory === CategoryType.DOCUMENTS ? 'text-blue-700' : 
+             'bg-slate-50 border-slate-100',
+      text: baseCategory === CategoryType.DOCUMENTS ? 'text-blue-700' :
             baseCategory === CategoryType.APPOINTMENTS ? 'text-emerald-700' :
             baseCategory === CategoryType.VIOLET ? 'text-violet-700' :
-            'text-slate-700', 
-      focus: `focus:border-${baseColorName}-300`, 
-      accent: `accent-${baseColorName}-600`, 
-      label: `text-${baseColorName}-400`, 
-      saveBtn: `bg-${baseColorName}-600` 
+            'text-slate-700',
+      focus: `focus:border-${baseColorName}-300`,
+      accent: `accent-${baseColorName}-600`,
+      label: `text-${baseColorName}-400`,
+      saveBtn: `bg-${baseColorName}-600`
     };
   };
 
@@ -816,15 +814,15 @@ const App: React.FC = () => {
               <div className="relative mb-6"><Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" strokeWidth={1.5} /><input value={searchQuery} onChange={e => setSearchQuery(e.target.value)} placeholder={t.upcoming} className={`w-full pl-12 pr-4 py-4 rounded-2xl font-bold text-xs outline-none border border-transparent focus:border-indigo-500/50 transition-all ${state.theme === 'dark' ? (state.user.wallpaper ? 'bg-slate-800/50 text-white' : 'bg-slate-800 text-white') : (state.user.wallpaper ? 'bg-white/50 text-slate-900' : 'bg-slate-50 shadow-inner')}`} /></div>
               <div className="flex justify-between mb-4">{Object.values(CategoryType).filter(c => c !== CategoryType.NOTES && c !== CategoryType.VIOLET).map(cat => (
                 <div key={cat} className="w-[31.25%] flex flex-col items-center">
-                  <button 
-                    onClick={() => setDashboardFilter(dashboardFilter === cat ? null : cat)} 
+                  <button
+                    onClick={() => setDashboardFilter(dashboardFilter === cat ? null : cat)}
                     style={dashboardFilter === cat ? {} : getSubtleBgStyle(cat)}
                     className={`w-[90%] aspect-[1/0.38] rounded-2xl flex items-center justify-center transition-all ${dashboardFilter === cat ? `bg-gradient-to-br ${CATEGORY_DETAILS[cat].color} text-white shadow-lg scale-105` : (state.theme === 'dark' ? `backdrop-blur-sm ${SHARED_GLOW_EFFECT}` : (state.user.wallpaper ? `backdrop-blur-sm shadow-sm` : ''))}`}>
                     <div className={dashboardFilter === cat ? 'text-white' : CATEGORY_DETAILS[cat].textColor}>
-                      {React.cloneElement(CATEGORY_DETAILS[cat].icon as React.ReactElement<any>, { className: "w-[34.96px] h-[34.96px]", strokeWidth: 1.5 })}
+                      {React.cloneElement(CATEGORY_DETAILS[cat].icon, { className: "w-[34.96px] h-[34.96px]", strokeWidth: 1.5 })}
                     </div>
                   </button>
-                  {dashboardFilter === cat && <span className={`text-[15.1px] font-black uppercase tracking-tighter mt-1 text-center whitespace-nowrap w-full ${CATEGORY_DETAILS[cat].textColor}`}>{cat === CategoryType.DOCUMENTS ? t.homeDocuments : (t as any)[cat.toLowerCase()]}</span>}
+                  {dashboardFilter === cat && <span className={`text-[15.1px] font-black uppercase tracking-tighter mt-1 text-center whitespace-nowrap w-full ${CATEGORY_DETAILS[cat].textColor}`}>{cat === CategoryType.DOCUMENTS ? t.homeDocuments : t[cat.toLowerCase()]}</span>}
                 </div>))}
               </div>
             </div>
@@ -839,18 +837,18 @@ const App: React.FC = () => {
             <div className="flex-1 overflow-y-auto px-[30.36px] pt-6 pb-28 animate-in fade-in duration-500 relative z-10">
               <div className="grid grid-cols-2 gap-6 mb-6">
                 {Object.values(CategoryType).filter(c => c !== CategoryType.NOTES && c !== CategoryType.VIOLET).map(cat => (
-                  <button key={cat} 
-                    onClick={() => { setActiveCategory(cat); setActiveSubCategory(null); if (isDirectAddMode || isDirectOnce) { if (cat === CategoryType.BIRTHDAYS) { setRepeatYearly(true); setModalNotifyValue(1); setIsModalOpen(true); setIsDirectOnce(false); } else setCurrentView('sub-categories'); } else { if (cat === CategoryType.BIRTHDAYS) setCurrentView('category-detail'); else setCurrentView('sub-categories'); } }} 
-                    style={getSubtleBgStyle(cat)} 
+                  <button key={cat}
+                    onClick={() => { setActiveCategory(cat); setActiveSubCategory(null); if (isDirectAddMode || isDirectOnce) { if (cat === CategoryType.BIRTHDAYS) { setRepeatYearly(true); setModalNotifyValue(1); setIsModalOpen(true); setIsDirectOnce(false); } else setCurrentView('sub-categories'); } else { if (cat === CategoryType.BIRTHDAYS) setCurrentView('category-detail'); else setCurrentView('sub-categories'); } }}
+                    style={getSubtleBgStyle(cat)}
                     className={`aspect-square rounded-[2rem] p-6 flex flex-col items-center justify-center border-[1.4px] transition-all active:scale-95 backdrop-blur-md ${CATEGORY_DETAILS[cat].textColor.replace('text-', 'border-')}`}>
-                    <div className={`mb-4 ${CATEGORY_DETAILS[cat].textColor}`}>{React.cloneElement(CATEGORY_DETAILS[cat].icon as React.ReactElement<any>, { className: "w-12 h-12", strokeWidth: 1.05 })}</div>
-                    <span className={`font-black text-[12.5px] uppercase tracking-widest text-center ${CATEGORY_DETAILS[cat].textColor}`}>{(t as any)[cat.toLowerCase()]}</span>
+                    <div className={`mb-4 ${CATEGORY_DETAILS[cat].textColor}`}>{React.cloneElement(CATEGORY_DETAILS[cat].icon, { className: "w-12 h-12", strokeWidth: 1.05 })}</div>
+                    <span className={`font-black text-[12.5px] uppercase tracking-widest text-center ${CATEGORY_DETAILS[cat].textColor}`}>{t[cat.toLowerCase()]}</span>
                   </button>
                 ))}
               </div>
-              <button 
-                onClick={() => { setActiveCategory(CategoryType.NOTES); if (isDirectAddMode || isDirectOnce) { setNoteIconColor(CategoryType.NOTES); setRepeatYearly(false); setIsModalOpen(true); setIsDirectOnce(false); } else { setCurrentView('category-detail'); } }} 
-                style={getSubtleBgStyle(CategoryType.NOTES)} 
+              <button
+                onClick={() => { setActiveCategory(CategoryType.NOTES); if (isDirectAddMode || isDirectOnce) { setNoteIconColor(CategoryType.NOTES); setRepeatYearly(false); setIsModalOpen(true); setIsDirectOnce(false); } else { setCurrentView('category-detail'); } }}
+                style={getSubtleBgStyle(CategoryType.NOTES)}
                 className={`w-full h-[70px] rounded-[2rem] border-[1.4px] border-slate-400 flex items-center justify-center gap-4 transition-all active:scale-95 backdrop-blur-md text-slate-500`}>
                 <StickyNote className="w-8 h-8" strokeWidth={1.05} />
                 <span className={`font-black text-[12.5px] uppercase tracking-widest ${CATEGORY_DETAILS[CategoryType.NOTES].textColor}`}>{t.notes}</span>
@@ -862,7 +860,7 @@ const App: React.FC = () => {
           <div className="flex-1 flex flex-col overflow-hidden">
             <div style={state.user.wallpaper ? {backgroundColor: state.theme === 'dark' ? `rgba(15, 23, 42, ${uiBaseOpacity})` : `rgba(255, 255, 255, ${uiBaseOpacity})`} : {}} className="px-[30.36px] pt-4 pb-4 shrink-0 z-10">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4"><button onClick={() => setCurrentView('categories')} className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors active:scale-90 ${state.user.wallpaper ? 'bg-slate-100/60 backdrop-blur-sm' : 'bg-slate-100 dark:bg-slate-800'}`}><ChevronLeft className="text-slate-600" strokeWidth={1.5} /></button><h2 className="text-xs font-black uppercase">{(t as any)[activeCategory.toLowerCase()]}</h2></div>
+                <div className="flex items-center gap-4"><button onClick={() => setCurrentView('categories')} className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors active:scale-90 ${state.user.wallpaper ? 'bg-slate-100/60 backdrop-blur-sm' : 'bg-slate-100 dark:bg-slate-800'}`}><ChevronLeft className="text-slate-600" strokeWidth={1.5} /></button><h2 className="text-xs font-black uppercase">{t[activeCategory.toLowerCase()]}</h2></div>
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-black tracking-widest uppercase text-slate-500">{state.language === 'es' ? 'MODO DIRECTO' : 'DIRECT MODE'}</span>
                   <button onClick={() => { if (!isDirectAddMode) setIsDirectModeConfirmOpen(true); else setIsDirectAddMode(false); }} className={`w-[33.6px] h-[16.8px] rounded-full relative transition-all ${isDirectAddMode ? 'bg-emerald-50 border-[0.5px] border-emerald-600' : 'bg-slate-300'} flex items-center shadow-sm active:scale-95`}><div className={`absolute w-[12px] h-[12px] rounded-full bg-white shadow-md transition-all ${isDirectAddMode ? 'right-[2px] border border-emerald-600' : 'left-[2px]'}`} /></button>
@@ -873,8 +871,8 @@ const App: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 {SUB_MAP[activeCategory].map(sub => (
                   <button key={sub} onClick={() => { setActiveSubCategory(sub); if (isDirectAddMode || isDirectOnce) { const notifyVal = activeCategory === CategoryType.DOCUMENTS ? 30 : (activeCategory === CategoryType.APPOINTMENTS ? 2 : 7); setModalNotifyValue(notifyVal); setRepeatYearly(false); setIsModalOpen(true); setIsDirectOnce(false); } else setCurrentView('category-detail'); }} className={`aspect-square rounded-[2rem] ${activeCategory === CategoryType.SUBSCRIPTIONS ? 'bg-gradient-to-br from-amber-400 to-amber-600' : `bg-gradient-to-br ${CATEGORY_DETAILS[activeCategory].color}`} p-5 flex flex-col items-center justify-between border border-white/20 active:scale-95 transition-all shadow-lg`}>
-                    <div className="flex-1 flex items-start justify-center pt-2"><div className="p-4 bg-white/20 rounded-xl text-white">{React.cloneElement(SUB_CATEGORY_DETAILS[sub].icon as React.ReactElement<any>, { strokeWidth: 1.5 })}</div></div>
-                    <span className="text-white font-black text-[13.8px] uppercase tracking-widest text-center pb-2">{(t as any)[SUB_CATEGORY_DETAILS[sub].labelKey]}</span>
+                    <div className="flex-1 flex items-start justify-center pt-2"><div className="p-4 bg-white/20 rounded-xl text-white">{React.cloneElement(SUB_CATEGORY_DETAILS[sub].icon, { strokeWidth: 1.5 })}</div></div>
+                    <span className="text-white font-black text-[13.8px] uppercase tracking-widest text-center pb-2">{t[SUB_CATEGORY_DETAILS[sub].labelKey]}</span>
                   </button>
                 ))}
               </div>
@@ -888,10 +886,10 @@ const App: React.FC = () => {
                 <button onClick={() => { if(activeCategory === CategoryType.BIRTHDAYS || activeCategory === CategoryType.NOTES) setCurrentView('categories'); else setCurrentView('sub-categories'); }} className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 active:scale-90 transition-all ${state.user.wallpaper ? 'bg-slate-100/60 backdrop-blur-sm' : 'bg-slate-100 dark:bg-slate-800'}`}><ChevronLeft className="text-slate-600" strokeWidth={1.5} /></button>
                 <div className="flex items-center gap-4 truncate">
                   <div className={activeCategory === CategoryType.BIRTHDAYS ? 'text-indigo-600' : (activeCategory === CategoryType.NOTES ? 'text-slate-500' : CATEGORY_DETAILS[activeCategory].textColor)}>
-                    {activeSubCategory && SUB_CATEGORY_DETAILS[activeSubCategory] ? React.cloneElement(SUB_CATEGORY_DETAILS[activeSubCategory].icon as React.ReactElement<any>, { className: "w-12 h-12", strokeWidth: 1.5 }) : (activeCategory === CategoryType.NOTES ? <StickyNote className="w-12 h-12" strokeWidth={1.5} /> : React.cloneElement(CATEGORY_DETAILS[activeCategory].icon as React.ReactElement<any>, { className: "w-12 h-12", strokeWidth: 1.5 }))}
+                    {activeSubCategory && SUB_CATEGORY_DETAILS[activeSubCategory] ? React.cloneElement(SUB_CATEGORY_DETAILS[activeSubCategory].icon, { className: "w-12 h-12", strokeWidth: 1.5 }) : (activeCategory === CategoryType.NOTES ? <StickyNote className="w-12 h-12" strokeWidth={1.5} /> : React.cloneElement(CATEGORY_DETAILS[activeCategory].icon, { className: "w-12 h-12", strokeWidth: 1.5 }))}
                   </div>
                   <h2 className={`text-[26.5px] font-black uppercase leading-tight truncate ${activeCategory === CategoryType.BIRTHDAYS ? 'text-indigo-600' : (activeCategory === CategoryType.NOTES ? 'text-slate-500' : CATEGORY_DETAILS[activeCategory].textColor)}`}>
-                    {activeCategory === CategoryType.BIRTHDAYS ? t.birthdays : (activeSubCategory && SUB_CATEGORY_DETAILS[activeSubCategory] ? (t as any)[SUB_CATEGORY_DETAILS[activeSubCategory].labelKey] : (t as any)[activeCategory!.toLowerCase()])}
+                    {activeCategory === CategoryType.BIRTHDAYS ? t.birthdays : (activeSubCategory && SUB_CATEGORY_DETAILS[activeSubCategory] ? t[SUB_CATEGORY_DETAILS[activeSubCategory].labelKey] : t[activeCategory.toLowerCase()])}
                   </h2>
                 </div>
               </div>
@@ -912,7 +910,7 @@ const App: React.FC = () => {
               <div style={modalBgStyle} className={`mb-6 p-6 rounded-[2.5rem] border flex gap-4 items-start ${activeCategory === CategoryType.BIRTHDAYS ? 'bg-indigo-50 border-indigo-100' : getDynamicModalStyles(activeCategory).light}`}>
                 <Info className={`w-5 h-5 ${activeCategory === CategoryType.BIRTHDAYS ? 'text-indigo-600' : getDynamicModalStyles(activeCategory).text} shrink-0 mt-0.5`} strokeWidth={1.5} />
                 <p className={`text-[13.2px] font-bold leading-relaxed tracking-wider ${activeCategory === CategoryType.BIRTHDAYS ? 'text-indigo-500' : getDynamicModalStyles(activeCategory).label}`}>
-                  {(activeCategory === CategoryType.NOTES ? t.desc_NOTES : (activeSubCategory ? (t as any)[`desc_${activeSubCategory}`] : (activeCategory ? (t as any)[`desc_${activeCategory}`] : ''))).split('\n').map((line: string, i: number) => (
+                  {(activeCategory === CategoryType.NOTES ? t.desc_NOTES : (activeSubCategory ? t[`desc_${activeSubCategory}`] : (activeCategory ? t[`desc_${activeCategory}`] : ''))).split('\n').map((line, i) => (
                     <span key={i} className={`${line.toUpperCase().includes('IMPORTAN') ? 'italic block' : 'block'}`}>{line}</span>
                   ))}
                 </p>
@@ -934,7 +932,7 @@ const App: React.FC = () => {
                <div className="space-y-6">
                  <div onClick={() => setIsProfileModalOpen(true)} className={`rounded-[2rem] p-7 border transition-all cursor-pointer relative overflow-hidden ${state.theme === 'dark' ? (state.user.wallpaper ? 'bg-slate-800/70 backdrop-blur-md border-slate-700' : 'bg-slate-800 border-slate-700') : (state.user.wallpaper ? 'bg-white/70 backdrop-blur-md border-slate-100 shadow-sm' : 'bg-white border-slate-100 shadow-sm')}`}><div className="flex items-center gap-4 relative z-10"><div className="w-14 h-14 bg-violet-500 rounded-2xl flex items-center justify-center text-white shadow-lg overflow-hidden border border-white/20">{state.user.showProfileImage && state.user.profileImage ? <img src={state.user.profileImage} alt="Profile" className="w-full h-full object-cover" /> : <UserIcon strokeWidth={1.5} />}</div><div className="flex-1"><div className="flex items-center gap-2"><h3 className="font-black text-sm uppercase">{state.user.name}</h3>{state.isPro && <span className="bg-amber-400 text-white text-[8px] font-black px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm"><Crown className="w-2 h-2" strokeWidth={1.5} /> GOLD</span>}</div><p className="text-[10px] text-slate-400 font-bold">{state.user.email}</p></div><Edit2 className="w-4 h-4 text-slate-300" strokeWidth={1.5} /></div></div>
                  
-                 <div className={`rounded-[2.5rem] p-6 border ${state.theme === 'dark' ? (state.user.wallpaper ? 'bg-slate-800/70 backdrop-blur-md border-slate-700' : 'bg-slate-800 border-slate-700') : (state.user.wallpaper ? 'bg-white/70 border-slate-100 backdrop-blur-md' : 'bg-white border-slate-100 shadow-sm')} space-y-6 shadow-sm`}><div className="flex items-center justify-between cursor-pointer" onClick={() => setIsLangModalOpen(true)}><div className="flex items-center gap-3"><Globe className="text-indigo-600" strokeWidth={1.5} /><span className="text-[11px] font-black uppercase">{t.language}</span></div><span className="text-[11px] font-black text-indigo-600 dark:text-white uppercase">{LANGUAGE_NAMES[state.language]}</span></div><div className="flex items-center justify-between"><div className="flex items-center gap-3"><Moon strokeWidth={1.5} /><span className="text-[11px] font-black uppercase">{t.theme}</span>{!state.isPro && <Crown className="w-3.5 h-3.5 text-amber-500" strokeWidth={1.5} />}</div><button onClick={handleToggleTheme} className={`w-12 h-6 rounded-full relative transition-all ${state.theme === 'dark' ? 'bg-emerald-50' : 'bg-slate-300'} flex items-center`}><div className={`absolute w-4 h-4 rounded-full bg-white shadow-md transition-all ${state.theme === 'dark' ? 'right-1' : 'left-1'}`} /></button></div><div className="flex items-center justify-between"><div className="flex items-center gap-3"><Trash2 className="text-rose-500 w-5 h-5" strokeWidth={1.5} /><span className="text-[11px] font-black uppercase leading-tight">{t.autoDelete}</span>{!state.isPro && <Crown className="w-3.5 h-3.5 text-amber-500" strokeWidth={1.5} />}</div><button onClick={handleToggleAutoDelete} className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${state.globalSettings.autoDeleteExpired ? 'bg-indigo-600' : 'bg-slate-300'} flex items-center`} ><div className={`absolute w-4 h-4 rounded-full bg-white transition-all shadow-md ${state.globalSettings.autoDeleteExpired ? 'right-1' : 'left-1'}`} /></button></div><div className="flex items-center justify-between"><div className="flex items-center gap-3"><Mail className="text-indigo-600 w-5 h-5" strokeWidth={1.5} /><span className="text-[11px] font-black uppercase leading-tight">{t.notifyMethod}</span>{!state.isPro && <Crown className="w-3.5 h-3.5 text-amber-500" strokeWidth={1.5} />}</div><button onClick={() => { if (!state.isPro) setIsPaywallOpen(true); else if (state.globalSettings.reminderMethod === 'mail') setState(p => ({...p, globalSettings: {...p.globalSettings, reminderMethod: 'push'}})); else setIsEmailAlertConfirmOpen(true); }} className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${state.globalSettings.reminderMethod === 'mail' ? 'bg-indigo-600' : 'bg-slate-300'} flex items-center`} ><div className={`absolute w-4 h-4 rounded-full bg-white transition-all shadow-md ${state.globalSettings.reminderMethod === 'mail' ? 'right-1' : 'left-1'}`} /></button></div><div className="flex items-center justify-between cursor-pointer" onClick={() => { 
+                 <div className={`rounded-[2.5rem] p-6 border ${state.theme === 'dark' ? (state.user.wallpaper ? 'bg-slate-800/70 backdrop-blur-md border-slate-700' : 'bg-slate-800 border-slate-700') : (state.user.wallpaper ? 'bg-white/70 border-slate-100 backdrop-blur-md' : 'bg-white border-slate-100 shadow-sm')} space-y-6 shadow-sm`}><div className="flex items-center justify-between cursor-pointer" onClick={() => setIsLangModalOpen(true)}><div className="flex items-center gap-3"><Globe className="text-indigo-600" strokeWidth={1.5} /><span className="text-[11px] font-black uppercase">{t.language}</span></div><span className="text-[11px] font-black text-indigo-600 dark:text-white uppercase">{LANGUAGE_NAMES[state.language]}</span></div><div className="flex items-center justify-between"><div className="flex items-center gap-3"><Moon strokeWidth={1.5} /><span className="text-[11px] font-black uppercase">{t.theme}</span>{!state.isPro && <Crown className="w-3.5 h-3.5 text-amber-500" strokeWidth={1.5} />}</div><button onClick={handleToggleTheme} className={`w-12 h-6 rounded-full relative transition-all ${state.theme === 'dark' ? 'bg-emerald-50' : 'bg-slate-300'} flex items-center`}><div className={`absolute w-4 h-4 rounded-full bg-white shadow-md transition-all ${state.theme === 'dark' ? 'right-1' : 'left-1'}`} /></button></div><div className="flex items-center justify-between"><div className="flex items-center gap-3"><Trash2 className="text-rose-500 w-5 h-5" strokeWidth={1.5} /><span className="text-[11px] font-black uppercase leading-tight">{t.autoDelete}</span>{!state.isPro && <Crown className="w-3.5 h-3.5 text-amber-500" strokeWidth={1.5} />}</div><button onClick={handleToggleAutoDelete} className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${state.globalSettings.autoDeleteExpired ? 'bg-indigo-600' : 'bg-slate-300'} flex items-center`} ><div className={`absolute w-4 h-4 rounded-full bg-white transition-all shadow-md ${state.globalSettings.autoDeleteExpired ? 'right-1' : 'left-1'}`} /></button></div><div className="flex items-center justify-between"><div className="flex items-center gap-3"><Mail className="text-indigo-600 w-5 h-5" strokeWidth={1.5} /><span className="text-[11px] font-black uppercase leading-tight">{t.notifyMethod}</span>{!state.isPro && <Crown className="w-3.5 h-3.5 text-amber-500" strokeWidth={1.5} />}</div><button onClick={() => { if (!state.isPro) setIsPaywallOpen(true); else if (state.globalSettings.reminderMethod === 'mail') setState(p => ({...p, globalSettings: {...p.globalSettings, reminderMethod: 'push'}})); else setIsEmailAlertConfirmOpen(true); }} className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${state.globalSettings.reminderMethod === 'mail' ? 'bg-indigo-600' : 'bg-slate-300'} flex items-center`} ><div className={`absolute w-4 h-4 rounded-full bg-white transition-all shadow-md ${state.globalSettings.reminderMethod === 'mail' ? 'right-1' : 'left-1'}`} /></button></div><div className="flex items-center justify-between cursor-pointer" onClick={() => {
                    const [h24, m] = state.globalSettings.defaultNotificationTime.split(':');
                    let h = parseInt(h24);
                    const ampm = h >= 12 ? 'PM' : 'AM';
@@ -963,9 +961,9 @@ const App: React.FC = () => {
       </main>
 
       <nav style={section1BgStyle} className={`fixed bottom-0 left-0 right-0 border-t backdrop-blur-xl flex justify-around items-center py-6 z-50 px-[30.36px] mx-auto w-full max-w-xl border-white/10`}>
-        {[ { icon: <Home />, view: 'dashboard' as View }, { icon: <LayoutGrid />, view: 'categories' as View }, { icon: <CalendarIcon />, view: 'calendar' as View }, { icon: <SettingsIcon />, view: 'settings' as View } ].map(item => {
+        {[ { icon: <Home />, view: 'dashboard' }, { icon: <LayoutGrid />, view: 'categories' }, { icon: <CalendarIcon />, view: 'calendar' }, { icon: <SettingsIcon />, view: 'settings' } ].map(item => {
           const isActive = currentView === item.view;
-          return ( <button key={item.view} onClick={() => { setCurrentView(item.view); setActiveCategory(null); setActiveSubCategory(null); setDashboardFilter(null); setSelectedCalendarDay(new Date()); setIsDirectOnce(false); }} className={`flex flex-col items-center gap-1.5 transition-all ${isActive ? 'text-indigo-600 scale-110' : 'text-slate-400 hover:text-slate-500'}`}>{React.cloneElement(item.icon as React.ReactElement<any>, { className: "w-8 h-8", strokeWidth: 1.5 })}</button> );
+          return ( <button key={item.view} onClick={() => { setCurrentView(item.view); setActiveCategory(null); setActiveSubCategory(null); setDashboardFilter(null); setSelectedCalendarDay(new Date()); setIsDirectOnce(false); }} className={`flex flex-col items-center gap-1.5 transition-all ${isActive ? 'text-indigo-600 scale-110' : 'text-slate-400 hover:text-slate-500'}`}>{React.cloneElement(item.icon, { className: "w-8 h-8", strokeWidth: 1.5 })}</button> );
         })}
       </nav>
 
@@ -974,7 +972,7 @@ const App: React.FC = () => {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[150] flex items-end justify-center">
           <div style={modalBgStyle} className={`w-full max-w-xl rounded-t-[3.5rem] p-9 animate-in slide-in-from-bottom max-h-[80vh] overflow-y-auto ${state.theme === 'dark' ? 'text-white' : 'text-slate-700 shadow-2xl'}`}><div className="flex justify-between items-center mb-8"><div><h2 className="text-xl font-black uppercase tracking-widest">{t.eventsForDay}</h2><p className="text-[22.68px] font-bold text-slate-600 mt-1 uppercase tracking-widest leading-tight">{selectedCalendarDay.toLocaleDateString(state.language, { day: 'numeric', month: 'long', year: 'numeric' })}</p></div><button onClick={() => setIsDayModalOpen(false)} className="p-3 bg-slate-100 dark:bg-slate-700 rounded-full shadow-sm active:scale-75 transition-all"><X className="w-5 h-5 text-slate-900 dark:text-white"/></button></div><div className="space-y-2 mb-8">{getDayEvents(selectedCalendarDay).length > 0 ? getDayEvents(selectedCalendarDay).map(item => <DateCard key={item.id} item={item} language={state.language} theme={state.theme} wallpaper={state.user.wallpaper} onCardClick={openEventDetails} onDeleteClick={(id) => setIsDeleteConfirmOpen(id)} />) : <div className="py-10 text-center opacity-30"><CalendarIcon className="mx-auto mb-2 w-8 h-8" strokeWidth={1.5} /><p className="text-[10px] font-black uppercase tracking-widest">{t.noEventsToday}</p></div>}</div><button onClick={() => { if(!state.isPro) setIsPaywallOpen(true); else { setIsDayModalOpen(false); setIsDirectOnce(true); setCurrentView('categories'); } }} className="w-full bg-indigo-600 text-white py-5 rounded-[2rem] font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-0 active:scale-95 transition-all relative">
             {!state.isPro && <Crown className="w-4 h-4 text-amber-500 absolute top-1 right-2" strokeWidth={1.5} />}
-            <Plus className="w-9 h-9" strokeWidth={2.5} /> 
+            <Plus className="w-9 h-9" strokeWidth={2.5} />
             <span className="text-[13px]">{`${t.addDate} ${state.language === 'es' ? 'O NOTA' : 'OR NOTE'}`}</span>
           </button></div>
         </div>
@@ -990,15 +988,15 @@ const App: React.FC = () => {
                   <h2 className={`${createModalStyles.text} text-[26.5px] font-black uppercase leading-tight`}>{t.addNote}</h2>
                 </div>
               ) : (
-                <div className="flex flex-col w-full"><p className="text-[20.1px] font-black uppercase text-slate-400 leading-tight text-left mb-2">{t.addDate}</p><div className="flex items-center gap-4"><div className={activeCategory === CategoryType.BIRTHDAYS ? 'text-indigo-600' : createModalStyles.text}>{activeSubCategory ? React.cloneElement(SUB_CATEGORY_DETAILS[activeSubCategory].icon as React.ReactElement<any>, { className: "w-12 h-12", strokeWidth: 1.5 }) : React.cloneElement(CATEGORY_DETAILS[(activeCategory as any) || CategoryType.BIRTHDAYS].icon as React.ReactElement<any>, { className: "w-12 h-12", strokeWidth: 1.5 })}</div><h2 className={`${activeCategory === CategoryType.BIRTHDAYS ? 'text-indigo-600' : createModalStyles.text} text-[26.5px] font-black uppercase leading-tight`}>{(activeCategory as any) === CategoryType.BIRTHDAYS ? t.birthdays : (activeSubCategory ? (t as any)[SUB_CATEGORY_DETAILS[activeSubCategory].labelKey] : (t as any)[activeCategory!.toLowerCase()])}</h2></div></div>
+                <div className="flex flex-col w-full"><p className="text-[20.1px] font-black uppercase text-slate-400 leading-tight text-left mb-2">{t.addDate}</p><div className="flex items-center gap-4"><div className={activeCategory === CategoryType.BIRTHDAYS ? 'text-indigo-600' : createModalStyles.text}>{activeSubCategory ? React.cloneElement(SUB_CATEGORY_DETAILS[activeSubCategory].icon, { className: "w-12 h-12", strokeWidth: 1.5 }) : React.cloneElement(CATEGORY_DETAILS[activeCategory || CategoryType.BIRTHDAYS].icon, { className: "w-12 h-12", strokeWidth: 1.5 })}</div><h2 className={`${activeCategory === CategoryType.BIRTHDAYS ? 'text-indigo-600' : createModalStyles.text} text-[26.5px] font-black uppercase leading-tight`}>{activeCategory === CategoryType.BIRTHDAYS ? t.birthdays : (activeSubCategory ? t[SUB_CATEGORY_DETAILS[activeSubCategory].labelKey] : t[activeCategory.toLowerCase()])}</h2></div></div>
               )}
               <button onClick={() => { setIsModalOpen(false); setIsRecording(false); setAudioBase64(null); setAttachedFileBase64(null); }} className="p-3 bg-slate-100 dark:bg-slate-200 rounded-full active:scale-75 transition-all"><X className="w-5 h-5 text-slate-900"/></button>
             </div>
-            <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); 
-              let finalDate = fd.get('date') as string;
+            <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget);
+              let finalDate = fd.get('date');
               if (activeCategory === CategoryType.BIRTHDAYS) {
                 const year = repeatYearly ? 2000 : new Date().getFullYear();
-                finalDate = `${year}-${birthMonth}-${birthDay}`;
+              finalDate = `${year}-${birthMonth}-${birthDay}`;
               } else if (activeSubCategory === 'BANCO_TARJETAS') {
                 finalDate = `${cardExpYear}-${cardExpMonth}-01`;
               }
@@ -1008,27 +1006,27 @@ const App: React.FC = () => {
                 if (apptAmPm === 'AM' && h === 12) h = 0;
                 return `${String(h).padStart(2, '0')}:${apptMin}`;
               })() : undefined;
-              const item: ReminderDate = { 
-                id: Math.random().toString(36).substring(2), 
-                title: fd.get('title') as string, 
-                date: finalDate, 
+              const item = {
+                id: Math.random().toString(36).substring(2),
+                title: fd.get('title'),
+                date: finalDate,
                 time: finalTime,
-                category: activeCategory || CategoryType.BIRTHDAYS, 
-                subCategory: activeSubCategory || 'OTRO', 
-                reminderFrequency: 'one-time', 
-                notifyDaysBefore: [modalNotifyValue], 
-                notes: fd.get('notes') as string, 
-                audioData: audioBase64 || undefined, 
-                fileData: attachedFileBase64 || undefined, 
-                fileName: attachedFileName || undefined, 
-                repeatYearly: activeCategory === CategoryType.BIRTHDAYS ? repeatYearly : repeatYearly, 
-                noteColor: activeCategory === CategoryType.NOTES ? noteIconColor : undefined 
-              }; 
-              setState(prev => ({...prev, dates: [...prev.dates, item]})); 
-              setIsModalOpen(false); setAudioBase64(null); setAttachedFileBase64(null); setAttachedFileName(null); 
+                category: activeCategory || CategoryType.BIRTHDAYS,
+                subCategory: activeSubCategory || 'OTRO',
+                reminderFrequency: 'one-time',
+                notifyDaysBefore: [modalNotifyValue],
+                notes: fd.get('notes'),
+                audioData: audioBase64 || undefined,
+                fileData: attachedFileBase64 || undefined,
+                fileName: attachedFileName || undefined,
+                repeatYearly: activeCategory === CategoryType.BIRTHDAYS ? repeatYearly : repeatYearly,
+                noteColor: activeCategory === CategoryType.NOTES ? noteIconColor : undefined
+              };
+              setState(prev => ({...prev, dates: [...prev.dates, item]}));
+              setIsModalOpen(false); setAudioBase64(null); setAttachedFileBase64(null); setAttachedFileName(null);
             }} className="space-y-6 pb-12">
               <div className="space-y-2"><label className={`text-[10px] font-black uppercase tracking-widest px-1 ${createModalStyles.text}`}>{t.title}</label><input required name="title" autoFocus className={`w-full p-6 rounded-[2.2rem] font-bold text-[18.5px] outline-none border transition-all ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 focus:border-indigo-400` : `bg-slate-50 border-slate-100 focus:border-indigo-300`} ${activeCategory === CategoryType.NOTES ? createModalStyles.text : 'text-slate-900 dark:text-white'}`} /></div>
-              
+             
               <div className="space-y-2">
                 <label className={`text-[10px] font-black uppercase tracking-widest px-1 ${createModalStyles.text}`}>{t.notes}</label>
                 <textarea name="notes" className={`w-full p-6 rounded-[2.2rem] font-bold text-[18.5px] resize-none outline-none border ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 focus:border-slate-500` : `bg-slate-50 border-slate-100 focus:border-slate-300`} ${createModalStyles.text}`} rows={4} />
@@ -1039,10 +1037,10 @@ const App: React.FC = () => {
                   <label className="text-[11px] font-black text-violet-600 dark:text-violet-300 uppercase tracking-widest px-1 block mb-6 text-center">{t.chooseColor}</label>
                   <div className="flex items-center justify-between w-full">
                     {[
-                      { type: CategoryType.BIRTHDAYS, color: '#ec4899' }, 
-                      { type: CategoryType.DOCUMENTS, color: '#3b82f6' }, 
-                      { type: CategoryType.SUBSCRIPTIONS, color: '#f97316' }, 
-                      { type: CategoryType.APPOINTMENTS, color: '#10b981' }, 
+                      { type: CategoryType.BIRTHDAYS, color: '#ec4899' },
+                      { type: CategoryType.DOCUMENTS, color: '#3b82f6' },
+                      { type: CategoryType.SUBSCRIPTIONS, color: '#f97316' },
+                      { type: CategoryType.APPOINTMENTS, color: '#10b981' },
                       { type: CategoryType.VIOLET, color: '#8b5cf6' },      
                       { type: CategoryType.NOTES, color: '#64748b' }        
                     ].map(item => (
@@ -1098,7 +1096,7 @@ const App: React.FC = () => {
                   )}
                 </div>
               )}
-              
+             
               {activeCategory === CategoryType.APPOINTMENTS && (
                 <div className="space-y-2">
                   <label className={`text-[10px] font-black uppercase tracking-widest px-1 ${createModalStyles.label}`}>{t.time}</label>
@@ -1167,9 +1165,9 @@ const App: React.FC = () => {
               <div className="flex flex-col w-full">
                 <div className="flex items-center gap-4 mb-2">
                   <div className={selectedEvent.category === CategoryType.BIRTHDAYS ? 'text-indigo-600' : detailModalStyles.text}>
-                    {selectedEvent.category === CategoryType.NOTES ? ( <StickyNote className="w-12 h-12" strokeWidth={1.5} /> ) : ( React.cloneElement((selectedEvent.category === CategoryType.BIRTHDAYS ? CATEGORY_DETAILS[selectedEvent.category].icon : (SUB_CATEGORY_DETAILS[selectedEvent.subCategory]?.icon || CATEGORY_DETAILS[selectedEvent.category].icon)) as React.ReactElement<any>, { className: "w-12 h-12", strokeWidth: 1.5 }) )}
+                    {selectedEvent.category === CategoryType.NOTES ? ( <StickyNote className="w-12 h-12" strokeWidth={1.5} /> ) : ( React.cloneElement((selectedEvent.category === CategoryType.BIRTHDAYS ? CATEGORY_DETAILS[selectedEvent.category].icon : (SUB_CATEGORY_DETAILS[selectedEvent.subCategory]?.icon || CATEGORY_DETAILS[selectedEvent.category].icon)), { className: "w-12 h-12", strokeWidth: 1.5 }) )}
                   </div>
-                  <h2 className={`text-[26.5px] font-black uppercase leading-tight ${selectedEvent.category === CategoryType.BIRTHDAYS ? 'text-indigo-600' : detailModalStyles.text}`}>{selectedEvent.category === CategoryType.BIRTHDAYS ? t.birthdays : selectedEvent.category === CategoryType.NOTES ? t.notes : (selectedEvent.subCategory ? (t as any)[SUB_CATEGORY_DETAILS[selectedEvent.subCategory].labelKey] : (t as any)[selectedEvent.category.toLowerCase()])}</h2>
+                  <h2 className={`text-[26.5px] font-black uppercase leading-tight ${selectedEvent.category === CategoryType.BIRTHDAYS ? 'text-indigo-600' : detailModalStyles.text}`}>{selectedEvent.category === CategoryType.BIRTHDAYS ? t.birthdays : selectedEvent.category === CategoryType.NOTES ? t.notes : (selectedEvent.subCategory ? (t)[SUB_CATEGORY_DETAILS[selectedEvent.subCategory].labelKey] : (t)[selectedEvent.category.toLowerCase()])}</h2>
                 </div>
                 <h2 className={`text-[26.5px] font-black uppercase leading-tight mb-2 mt-6 ${selectedEvent.category === CategoryType.NOTES ? detailModalStyles.text : 'text-slate-700 dark:text-white'}`}>{selectedEvent.title}</h2>
               </div>
@@ -1210,7 +1208,7 @@ const App: React.FC = () => {
               {selectedEvent.fileData && (
                 <div className="p-5 rounded-[2rem] bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-500/20 flex items-center justify-between">
                    <div className="flex items-center gap-3 overflow-hidden"><FileTextIcon className="text-emerald-600" /><p className="text-[10px] font-black uppercase text-emerald-600 dark:text-white truncate">{selectedEvent.fileName || t.attachedFile}</p></div>
-                   <button onClick={() => handleDownloadFile(selectedEvent.fileData!, selectedEvent.fileName || 'file')} className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center active:scale-90 transition-all shadow-md"><Download className="w-5 h-5" /></button>
+                   <button onClick={() => handleDownloadFile(selectedEvent.fileData, selectedEvent.fileName || 'file')} className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center active:scale-90 transition-all shadow-md"><Download className="w-5 h-5" /></button>
                 </div>
               )}
               <button onClick={handleUpdateReminder} className={`w-full py-5 rounded-[2rem] ${selectedEvent.category === CategoryType.BIRTHDAYS ? 'bg-indigo-600' : detailModalStyles.saveBtn} text-white font-black uppercase text-[15.6px] tracking-widest shadow-xl active:scale-95 flex items-center justify-center gap-3`}><Save className="w-6.5 h-6.5" strokeWidth={1.5} /> {t.save}</button>
@@ -1259,7 +1257,7 @@ const App: React.FC = () => {
             <h3 className="text-xl font-black mb-8 uppercase tracking-tighter italic">{t.selectLanguage}</h3>
             <div className="space-y-4">
               {Object.entries(LANGUAGE_NAMES).map(([code, name]) => (
-                <button key={code} onClick={() => { setState(p => ({ ...p, language: code as LanguageCode })); setIsLangModalOpen(false); }} className={`w-full py-5 rounded-[1.8rem] font-black text-sm uppercase tracking-widest transition-all ${state.language === code ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>{name}</button>
+                <button key={code} onClick={() => { setState(p => ({ ...p, language: code })); setIsLangModalOpen(false); }} className={`w-full py-5 rounded-[1.8rem] font-black text-sm uppercase tracking-widest transition-all ${state.language === code ? 'bg-indigo-600 text-white shadow-lg' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>{name}</button>
               ))}
             </div>
             <button onClick={() => setIsLangModalOpen(false)} className="mt-6 font-black text-[10px] uppercase text-slate-400">{t.no}</button>
@@ -1293,7 +1291,7 @@ const App: React.FC = () => {
                {state.isPro && (<div className="pt-2 border-t border-slate-200 dark:border-slate-600 space-y-2"><p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{t.purchaseDate}</p><p className="text-xs font-bold">{state.user.purchaseDate || 'N/A'}</p></div>)}
                {!state.isPro && (<button onClick={() => { setIsProfileModalOpen(false); setIsPaywallOpen(true); }} className="w-full bg-amber-500 text-white py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-md active:scale-95 transition-all flex items-center justify-center gap-2"><Zap className="w-3 h-3 fill-white" /> {t.upgradeToGold}</button>)}
             </div>
-            <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); setState(prev => ({ ...prev, user: { ...prev.user, name: fd.get('name') as string, email: fd.get('email') as string, dateOfBirth: fd.get('dob') as string } })); setIsProfileModalOpen(false); }} className="space-y-6 pb-12">
+            <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); setState(prev => ({ ...prev, user: { ...prev.user, name: fd.get('name'), email: fd.get('email'), dateOfBirth: fd.get('dob') } })); setIsProfileModalOpen(false); }} className="space-y-6 pb-12">
               <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{t.title}</label><input required name="name" defaultValue={state.user.name} className={`w-full p-6 rounded-[2.2rem] font-bold outline-none border transition-all ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 text-white focus:border-indigo-500` : `bg-slate-50 border-slate-100 text-slate-900 focus:border-indigo-300`}`} /></div>
               <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Email</label><input required name="email" defaultValue={state.user.email} className={`w-full p-6 rounded-[2.2rem] font-bold outline-none border transition-all ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 text-white focus:border-indigo-500` : `bg-slate-50 border-slate-100 text-slate-900 focus:border-indigo-300`}`} /></div>
               <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">{t.birthdays}</label><input required name="dob" type="date" defaultValue={state.user.dateOfBirth} className={`w-full p-6 rounded-[2.2rem] font-bold outline-none border transition-all ${state.theme === 'dark' ? `bg-slate-700 border-slate-600 text-white focus:border-indigo-500` : `bg-slate-50 border-slate-100 text-slate-900 focus:border-indigo-300`}`} /></div>
@@ -1364,16 +1362,16 @@ const App: React.FC = () => {
             </div>
             <div className="space-y-6 pb-12">
               <div className={`p-6 rounded-[2.2rem] border transition-all ${state.theme === 'dark' ? 'bg-violet-900/20 border-violet-500/30' : 'bg-violet-50 border-violet-100 shadow-sm'}`}>
-                 <label className="text-[10px] font-black text-violet-500 uppercase tracking-widest mb-2 block">{t.yourBirthday}</label>
-                 <div className="flex items-center gap-4">
-                   <input type="date" value={state.user.dateOfBirth} onChange={(e) => setState(p => ({...p, user: {...p.user, dateOfBirth: e.target.value}}))} className={`flex-1 p-4 rounded-2xl font-bold bg-white dark:bg-slate-800 border dark:border-slate-700 outline-none focus:border-violet-400 text-black`} />
-                   <div className="p-4 rounded-2xl bg-violet-600 text-white shadow-md"><CheckCircle2 className="w-5 h-5" /></div>
-                 </div>
+                  <label className="text-[10px] font-black text-violet-500 uppercase tracking-widest mb-2 block">{t.yourBirthday}</label>
+                  <div className="flex items-center gap-4">
+                    <input type="date" value={state.user.dateOfBirth} onChange={(e) => setState(p => ({...p, user: {...p.user, dateOfBirth: e.target.value}}))} className={`flex-1 p-4 rounded-2xl font-bold bg-white dark:bg-slate-800 border dark:border-slate-700 outline-none focus:border-violet-400 text-black`} />
+                    <div className="p-4 rounded-2xl bg-violet-600 text-white shadow-md"><CheckCircle2 className="w-5 h-5" /></div>
+                  </div>
               </div>
               <div className={`p-6 rounded-[2rem] border transition-all ${state.theme === 'dark' ? 'bg-indigo-900/20 border-indigo-500/30' : 'bg-indigo-50 border-indigo-100'}`}>
                 <p className={`text-[16.8px] font-medium leading-relaxed mb-4 italic whitespace-pre-line break-words ${state.theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>"{SHARE_MESSAGE_CUMPLEAÑOS(state.language, state.user.dateOfBirth || '')}"</p>
                 <button onClick={() => { navigator.clipboard.writeText(SHARE_MESSAGE_CUMPLEAÑOS(state.language, state.user.dateOfBirth || '')); alert(t.copiedToClipboard); }} className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg flex items-center justify-center gap-3 active:scale-95 transition-all"><Copy className="w-4 h-4" strokeWidth={1.5} /> {t.copyText}</button>
-                
+               
                 <div className="grid grid-cols-1 gap-4 mt-6">
                   <button onClick={() => { setBirthDay('01'); setBirthMonth('01'); setIsManualAddModalOpen(true); }} className="w-full py-4 bg-white dark:bg-slate-700 text-indigo-600 dark:text-white border border-indigo-100 dark:border-indigo-500/30 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-sm flex items-center justify-center gap-3 active:scale-95 transition-all">
                     <Plus className="w-4 h-4" strokeWidth={2.5} /> {t.addManually}
@@ -1398,9 +1396,9 @@ const App: React.FC = () => {
             <form onSubmit={(e) => {
               e.preventDefault();
               const fd = new FormData(e.currentTarget);
-              const newItem: ReminderDate = {
+              const newItem = {
                 id: Math.random().toString(36).substring(2),
-                title: fd.get('name') as string,
+                title: fd.get('name'),
                 date: `2000-${birthMonth}-${birthDay}`,
                 category: CategoryType.BIRTHDAYS,
                 subCategory: 'AMIGOS',
@@ -1441,7 +1439,7 @@ const App: React.FC = () => {
 
       {isPaywallOpen && (
         <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-xl z-[1200] flex items-center justify-center p-6">
-          <div style={modalBgStyle} className={`w-full max-md rounded-[3.5rem] p-9 relative animate-in zoom-in duration-300 overflow-y-auto max-h-[95vh]`}><button onClick={() => setIsPaywallOpen(false)} className="absolute top-6 right-6 p-3 bg-slate-100 dark:bg-slate-200 rounded-full shadow-sm active:scale-75 transition-all"><X className="w-4 h-4 text-slate-900 dark:text-white" /></button><div className="text-center mb-8"><div className="w-20 h-20 bg-gradient-to-br from-amber-300 to-amber-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-amber-500/20 rotate-3"><Crown className="text-white w-10 h-10" strokeWidth={1.5} /></div><h2 className="text-2xl font-black uppercase tracking-tighter mb-2 italic">{t.appName} <span className="text-amber-500">GOLD</span></h2><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t.lifetimeSub}</p></div><div className="space-y-4 mb-8">{t.goldFeatures.map((v: string, i: number) => (<div key={i} className="flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-700 rounded-2xl"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" strokeWidth={1.5} /><span className="text-xs font-bold uppercase tracking-tight">{v}</span></div>))}</div><button onClick={activatePremium} className="w-full bg-violet-950 text-white py-6 rounded-3xl font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all text-xs">{t.activateFor}</button></div>
+          <div style={modalBgStyle} className={`w-full max-md rounded-[3.5rem] p-9 relative animate-in zoom-in duration-300 overflow-y-auto max-h-[95vh]`}><button onClick={() => setIsPaywallOpen(false)} className="absolute top-6 right-6 p-3 bg-slate-100 dark:bg-slate-200 rounded-full shadow-sm active:scale-75 transition-all"><X className="w-4 h-4 text-slate-900 dark:text-white" /></button><div className="text-center mb-8"><div className="w-20 h-20 bg-gradient-to-br from-amber-300 to-amber-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-amber-500/20 rotate-3"><Crown className="text-white w-10 h-10" strokeWidth={1.5} /></div><h2 className="text-2xl font-black uppercase tracking-tighter mb-2 italic">{t.appName} <span className="text-amber-500">GOLD</span></h2><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t.lifetimeSub}</p></div><div className="space-y-4 mb-8">{t.goldFeatures.map((v, i) => (<div key={i} className="flex items-center gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-700 rounded-2xl"><CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" strokeWidth={1.5} /><span className="text-xs font-bold uppercase tracking-tight">{v}</span></div>))}</div><button onClick={activatePremium} className="w-full bg-violet-950 text-white py-6 rounded-3xl font-black uppercase tracking-widest shadow-2xl active:scale-95 transition-all text-xs">{t.activateFor}</button></div>
         </div>
       )}
 
@@ -1461,7 +1459,7 @@ const App: React.FC = () => {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[550] flex items-end justify-center">
           <div style={modalBgStyle} className={`w-full max-w-xl rounded-t-[3.5rem] p-9 animate-in slide-in-from-bottom max-h-[90vh] overflow-y-auto ${state.theme === 'dark' ? 'text-white' : 'text-slate-700 shadow-2xl'}`}>
             <div className="flex justify-between items-start mb-8"><h2 className="text-2xl font-black uppercase tracking-widest leading-tight">{t.dailyExpenses}</h2><button onClick={() => setIsModalOpenExpense(false)} className="p-3 bg-slate-100 dark:bg-slate-700 rounded-full active:scale-75 transition-all"><X className="w-5 h-5 text-slate-900 dark:text-white"/></button></div>
-            <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); const amountVal = parseFloat(fd.get('amount') as string); if (isNaN(amountVal)) return; const exp: Expense = { id: Math.random().toString(36).substring(2), amount: amountVal, category: fd.get('category') as ExpenseCategory, date: fd.get('date') as string, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), note: fd.get('note') as string, fileData: expensePhotoBase64 || undefined }; setState(p => ({...p, expenses: [...p.expenses, exp]})); setIsModalOpenExpense(false); setExpensePhotoBase64(null); }} className="space-y-6 pb-12">
+            <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); const amountVal = parseFloat(fd.get('amount')); if (isNaN(amountVal)) return; const exp = { id: Math.random().toString(36).substring(2), amount: amountVal, category: fd.get('category'), date: fd.get('date'), time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), note: fd.get('note'), fileData: expensePhotoBase64 || undefined }; setState(p => ({...p, expenses: [...p.expenses, exp]})); setIsModalOpenExpense(false); setExpensePhotoBase64(null); }} className="space-y-6 pb-12">
               <div className="grid grid-cols-[1.6fr_1fr] gap-4">
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t.amount}</label><input required name="amount" type="number" step="0.01" className={`w-full p-8 rounded-[2.5rem] font-bold text-[22px] outline-none border transition-all ${state.theme === 'dark' ? 'bg-slate-700 border-slate-600 focus:border-violet-500 text-white' : 'bg-slate-50 border-slate-100 focus:border-violet-300 text-slate-900'}`} /></div>
                 <div className="space-y-2"><label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t.currencyLabel}</label><input required defaultValue={state.user.currency} onChange={(e) => setState(p => ({...p, user: {...p.user, currency: e.target.value}}))} className={`w-full p-8 rounded-[2.5rem] font-bold text-[22px] outline-none border text-center ${state.theme === 'dark' ? 'bg-slate-700 border-slate-600 focus:border-violet-500 text-white' : 'bg-slate-50 border-slate-100 focus:border-violet-300 text-slate-900'}`} /></div>
@@ -1495,7 +1493,7 @@ const App: React.FC = () => {
              <div className="flex justify-between items-start mb-8"><h2 className="text-2xl font-black uppercase tracking-widest leading-tight">{t.expensesOf} {getMonthlyExpenses.monthName}</h2><button onClick={() => setIsViewExpensesModalOpen(false)} className="p-3 bg-slate-100 dark:bg-slate-700 rounded-full active:scale-75 transition-all"><X className="w-5 h-5 text-slate-900 dark:text-white"/></button></div>
              <div className="bg-indigo-600 rounded-[2.5rem] p-8 mb-8 text-white shadow-xl flex flex-col items-center gap-2"><p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">{t.totalMonthly}</p><h2 className="text-[44.5px] font-black leading-none">{getMonthlyExpenses.total.toFixed(2)} {state.user.currency}</h2></div>
              <div className="space-y-4 pb-12">
-               {(Object.entries(getMonthlyExpenses.grouped) as [string, { total: number, items: Expense[] }][]).map(([catKey, data]) => {
+               {Object.entries(getMonthlyExpenses.grouped).map(([catKey, data]) => {
                  const isExpanded = expandedExpenseCat === catKey;
                  return (
                    <div key={catKey} className={`rounded-[2.2rem] border transition-all overflow-hidden ${state.theme === 'dark' ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100 shadow-sm'}`}>
@@ -1508,7 +1506,7 @@ const App: React.FC = () => {
                          {data.items.map(item => (
                            <div key={item.id} className="flex items-center justify-between py-3 border-t border-slate-50 dark:border-slate-700">
                              <div><p className="text-[10px] font-black uppercase text-slate-400">{new Date(item.date).toLocaleDateString(state.language, { day: '2-digit', month: '2-digit' })} • {item.time}</p><p className="text-sm font-bold">{item.amount.toFixed(2)} {state.user.currency}</p></div>
-                             <div className="flex items-center gap-2">{item.fileData && (<button onClick={() => handleDownloadFile(item.fileData!, 'expense_photo')} className="p-2 text-indigo-600 active:scale-75 transition-all"><ImageIcon className="w-4 h-4" strokeWidth={1.5} /></button>)}<button onClick={() => setIsDeleteExpenseConfirmOpen(item.id)} className="p-2 text-rose-500 active:scale-75 transition-all"><Trash2 className="w-4 h-4" strokeWidth={1.5} /></button></div>
+                             <div className="flex items-center gap-2">{item.fileData && (<button onClick={() => handleDownloadFile(item.fileData, 'expense_photo')} className="p-2 text-indigo-600 active:scale-75 transition-all"><ImageIcon className="w-4 h-4" strokeWidth={1.5} /></button>)}<button onClick={() => setIsDeleteExpenseConfirmOpen(item.id)} className="p-2 text-rose-500 active:scale-75 transition-all"><Trash2 className="w-4 h-4" strokeWidth={1.5} /></button></div>
                            </div>
                          ))}
                        </div>
@@ -1541,3 +1539,5 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+  
