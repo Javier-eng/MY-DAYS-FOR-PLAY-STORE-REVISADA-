@@ -1,0 +1,42 @@
+{
+  "name": "Mis Fechas - Mis Gastos",
+  "short_name": "Mis Fechas",
+  "id": "/?lang=es",
+  "description": "Tu diario personal para el seguimiento de eventos y gestión del tiempo.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#6366f1",
+  "background_color": "#ffffff",
+  "lang": "es-ES",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/icono192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/icono512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/screenshotens1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Pantalla principal en español"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/screenshothor.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Vista de escritorio en español"
+    }
+  ]
+}
