@@ -4,23 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>My Dates</title>
-  
+ 
+  <link id="manifest-link" rel="manifest" href="/manifest-es.json">
   <script>
-    // Detect the browser language (first two characters, e.g., 'es' or 'en')
     const userLang = navigator.language || navigator.userLanguage;
-    const manifestFile = userLang.startsWith('es') ? '/manifest-es.json' : '/manifest-en.json';
- 
-    // Create the link tag dynamically
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = manifestFile;
+    const manifestLink = document.getElementById('manifest-link');
     
-    // Append it to the <head>
-    document.head.appendChild(link);
-    
-    console.log('Loading manifest for language:', userLang);
+    if (userLang.startsWith('en')) {
+      manifestLink.href = '/manifest-en.json';
+      console.log('Switching to English manifest');
+    } else {
+      console.log('Keeping default Spanish manifest');
+    }
   </script>
- 
   <meta name="theme-color" content="#6366f1">
   <script src="https://cdn.tailwindcss.com"></script>
   
