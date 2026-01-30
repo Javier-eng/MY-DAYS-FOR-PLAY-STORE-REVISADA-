@@ -9,16 +9,16 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/icono512.png",
+      "src": "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/icono192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/icono512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ],
   "categories": ["lifestyle", "utilities"],
