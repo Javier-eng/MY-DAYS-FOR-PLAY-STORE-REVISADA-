@@ -1,12 +1,14 @@
 {
-  "name": "My Days - My Expenses",
+ "name": "My Days: Personal Management",
   "short_name": "My Days",
+  "id": "/?lang=en",
   "description": "Never forget a birthday, document expiry, or important appointment again.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#4f46e5",
+  "theme_color": "#6366f1",
   "orientation": "portrait",
+  "lang": "en-US",
   "icons": [
     {
       "src": "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/icono-circulo192.png",
