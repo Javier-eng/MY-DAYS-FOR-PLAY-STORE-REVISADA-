@@ -2,7 +2,7 @@
   "name": "My Days - My Expenses",
   "short_name": "My Days",
   "description": "Never forget a birthday, document expiry, or important appointment again.",
-  "start_url": "./index.html",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4f46e5",
