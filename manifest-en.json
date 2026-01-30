@@ -21,6 +21,20 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["lifestyle", "utilities"],
-  "lang": "en-US"
+   "screenshots": [
+    {
+      "src": "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/screenshoteng1.png" ,
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Main dashboard in English"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/Javier-eng/MYDAYSPICS/refs/heads/main/screenshothor.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Desktop view in English"
+    }
+  ]
 }
